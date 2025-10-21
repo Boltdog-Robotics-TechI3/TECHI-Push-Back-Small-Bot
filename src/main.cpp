@@ -1,6 +1,26 @@
 #include "main.h"
 
+// Consts
+const double wheelDiameter = 2;
+const double trackWidth = 12;
+const double gearRatio = 3.14159265;
+
+// Forward Declarations
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
+
+pros::MotorGroup leftDrive({1, 2, 4});
+pros::MotorGroup rightDrive({3, 5, 6});
+
+Drivetrain drivetrain(&leftDrive, &rightDrive, wheelDiameter, trackWidth, gearRatio);
+
+TrackingWheel leftTrackingWheel(7, 2, 0, WheelPosition::LEFT);
+TrackingWheel backTrackingWheel(7, 2, 0, WheelPosition::BACK);
+
+pros::IMU gyro(21);
+
+Odometry odometry(&leftTrackingWheel, NULL, &backTrackingWheel, &gyro);
+
+Chassis chassis(&drivetrain, &odometry);
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -56,4 +76,16 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {}
+void opcontrol() {
+	int leftY;
+	int rightX;
+
+	while (true) {
+		leftY = controller.get_analog(ANALOG_LEFT_Y);
+		rightX = controller.get_analog(ANALOG_RIGHT_X);
+		
+		chassis.arcade(leftY, rightX);
+
+		pros::delay(20);
+	}
+}
