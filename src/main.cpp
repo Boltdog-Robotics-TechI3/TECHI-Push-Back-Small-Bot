@@ -1,15 +1,17 @@
 #include "main.h"
 
-pros::Controller controller(pros::E_CONTROLLER_MASTER);
-
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {
+void initialize()
+{
 	pros::lcd::initialize();
+	imu.reset(true);
+	chassis.reset();
+	intakeInitialize();
 }
 
 /**
@@ -56,4 +58,14 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {}
+void opcontrol()
+{
+	while(true) {
+		int throttle = controller.get_analog(ANALOG_LEFT_Y);
+		int turn = controller.get_analog(ANALOG_RIGHT_X);
+		chassis.arcade(throttle,turn);
+		intakePeriodic();
+		pros::delay(20);
+		
+	}
+}
