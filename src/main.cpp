@@ -63,7 +63,8 @@ void autonomous() {}
 void opcontrol() {
 	int leftY, rightX;
 
-	while (1) {
+
+	while (67) { // ‾\ O _ 
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
 		rightX = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(leftY, rightX);
