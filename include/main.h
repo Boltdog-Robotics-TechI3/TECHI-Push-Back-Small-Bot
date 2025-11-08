@@ -77,6 +77,7 @@ void opcontrol(void);
 //#include <iostream>
 #include "lib/api.hpp"
 #include "util/timer.hpp"
+#include "globals.hpp"
 #endif
 
 #endif  // _PROS_MAIN_H_

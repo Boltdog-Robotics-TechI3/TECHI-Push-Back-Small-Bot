@@ -1,4 +1,4 @@
-#include "main.h"
+#include "globals.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -52,15 +52,18 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+bool maybe = true;
 void opcontrol() {
+	int leftX;
 	int leftY;
 	int rightX;
 
-	while (true) {
+	while (maybe) {
+		leftX = controller.get_analog(ANALOG_LEFT_X);
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
 		rightX = controller.get_analog(ANALOG_RIGHT_X);
 		
-		chassis.arcade(leftY, rightX);
+		chassis.fieldCentricDrive(leftX, leftY, rightX);
 
 		pros::delay(20);
 	}
