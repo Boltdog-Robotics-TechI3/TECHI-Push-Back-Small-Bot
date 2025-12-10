@@ -5,18 +5,26 @@ inline const double wheelDiameter = 2.75;
 inline const double trackWidth = 12.5;
 inline const double gearRatio = 36.0 / 48.0;
 
+// Drivetrain Pieces
 inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
 inline pros::MotorGroup leftDrive({-18, -19, 20});
-inline pros::MotorGroup rightDrive({8, 9, -10});
-
-inline pros::Motor intake(7);
+inline pros::MotorGroup rightDrive({11, 12, -13});
 
 inline DifferentialDrivetrain drivetrain(&leftDrive, &rightDrive, wheelDiameter, trackWidth, gearRatio);
 
+// Intake Pieces
+inline pros::Motor intakeMotor(8);
+inline pros::Motor liftMotor(-9);
+inline pros::Motor selectorMotor(10);
+
+inline pros::adi::Pneumatics hoodPiston('A', false);
+inline pros::adi::Pneumatics liftPiston('B', true);
+
+// Odometry Pieces
 inline TrackingWheel verticalTrackingWheel(7, 2, 0, WheelPosition::LEFT);
 inline TrackingWheel horizontalTrackingWheel(6, 2, 0, WheelPosition::BACK);
 
-inline pros::IMU gyro(5);
+inline pros::IMU gyro(7);
 
 inline Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &gyro);
 

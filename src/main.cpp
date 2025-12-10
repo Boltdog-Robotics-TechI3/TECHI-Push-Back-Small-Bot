@@ -1,5 +1,7 @@
 #include "main.h"
 
+
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -62,9 +64,9 @@ void autonomous() {}
  */
 void opcontrol() {
 	int leftY, rightX;
+	bool sometimes = true;
 
-
-	while (67) { // ‾\ O _ 
+	while (sometimes) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
 		rightX = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(leftY, rightX);
