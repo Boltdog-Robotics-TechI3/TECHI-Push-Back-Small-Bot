@@ -12,20 +12,26 @@ inline double gear_ratio = 3.0/4.0;
 inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // Motor Groups
-inline pros::MotorGroup rightMotors({1, 2, -3});
-inline pros::MotorGroup leftMotors({-10, -9, 8});
-inline pros::MotorGroup intakeMotors({6});
+inline pros::MotorGroup rightMotors({16, -18, 17});
+inline pros::MotorGroup leftMotors({-14, 15, -13});
+inline pros::MotorGroup intakeMotors({-12 ,19,-20});
+inline pros::Motor top_Intake(12); 
+inline pros::Motor low_intakeR(19);
+inline pros::Motor low_intakeL(20);
 
+inline pros::adi::Pneumatics hood('h',false);
+inline pros::adi::Pneumatics scooper('g',false);
 // Drivetrain
-inline Drivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
+inline DifferentialDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
+
 
 // Tracking Wheel
-inline pros::IMU imu(7);
-inline TrackingWheel horizontalTrackingWheel(5, 2.08, 0, WheelPosition::BACK);
-inline TrackingWheel verticalTrackingWheel(-4, 2.08, 0.25, WheelPosition::LEFT);
+inline pros::IMU imu(11);
+inline TrackingWheel horizontalTrackingWheel(-2, 2.08, 0, WheelPosition::BACK);
+inline TrackingWheel verticalTrackingWheel(-1, 2.08, 0.25, WheelPosition::LEFT);
 
 // Odometry
 inline Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &imu);
 
 // Chassis
-inline Chassis chassis(&drivetrain, &odometry);
+inline DifferentialChassis chassis(&drivetrain, &odometry);
