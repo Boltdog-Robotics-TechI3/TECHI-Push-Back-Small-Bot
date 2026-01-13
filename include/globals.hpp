@@ -1,6 +1,11 @@
 #pragma once
 #include "main.h"
 
+inline bool skills = false;
+inline bool match = true;
+inline bool redAlliance = false;
+inline bool blueAlliance = true;
+inline int autoSelection = 0;
 
 inline const double wheelDiameter = 2.75;
 inline const double trackWidth = 12.5;
