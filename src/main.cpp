@@ -8,7 +8,7 @@
  */
 void initialize()
 {
-	pros::lcd::initialize();
+	initializeScreen();
 	imu.reset(true);
 	chassis.reset();
 	intakeInitialize();
