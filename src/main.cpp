@@ -53,7 +53,7 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	while(true) {
+	while (true) {
 		pros::delay(20);
 	}
 }

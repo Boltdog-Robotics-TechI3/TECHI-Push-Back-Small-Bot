@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "TECHI small",
+    "project_name": "Competition Template",
     "target": "v5",
     "templates": {
       "kernel": {
