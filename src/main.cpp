@@ -6,13 +6,7 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize()
-{
-	pros::lcd::initialize();
-	imu.reset(true);
-	chassis.reset();
-	intakeInitialize();
-}
+void initialize() {}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -58,14 +52,8 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol()
-{
-	while(true) {
-		int throttle = controller.get_analog(ANALOG_LEFT_Y);
-		int turn = controller.get_analog(ANALOG_RIGHT_X);
-		chassis.arcade(throttle,turn);
-		intakePeriodic();
+void opcontrol() {
+	while (true) {
 		pros::delay(20);
-		
 	}
 }
