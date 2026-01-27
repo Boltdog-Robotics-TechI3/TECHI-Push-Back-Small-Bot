@@ -64,8 +64,11 @@ void opcontrol() {
 		leftX = controller.get_analog(ANALOG_LEFT_X);
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
 		rightX = controller.get_analog(ANALOG_RIGHT_X);
+
+		intakePeriodic();
 		
-		chassis.fieldCentricDrive(leftX, leftY, rightX);
+		
+		chassis.fieldCentricDrive(leftY, leftX, rightX);
 
 		pros::delay(20);
 	}
