@@ -80,6 +80,7 @@ void opcontrol(void);
 #include "globals.hpp"
 #include "subsystems/intake.hpp"
 #include "screen.h"
+#include "subsystems/AutoCode"
 
 #endif
 

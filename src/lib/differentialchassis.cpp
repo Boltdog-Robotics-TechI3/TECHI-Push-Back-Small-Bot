@@ -9,8 +9,10 @@
  */
 void DifferentialChassis::arcade(int leftY, int rightX) {
     if (drivetrain) {
-        int leftPower = leftY + rightX;
-        int rightPower = leftY - rightX;
+        int scaledLeftY = scaleInput(leftY);
+        int scaledRightX = scaleInput(rightX);
+        int leftPower = scaledLeftY + scaledRightX;
+        int rightPower = scaledLeftY - scaledRightX;
         drivetrain->setMotorSpeeds({leftPower, rightPower});
     }
 }
@@ -22,7 +24,9 @@ void DifferentialChassis::arcade(int leftY, int rightX) {
  */
 void DifferentialChassis::tank(int leftY, int rightY) {
     if (drivetrain) {
-        drivetrain->setMotorSpeeds({leftY, rightY});
+        int scaledLeftY = scaleInput(leftY);
+        int scaledRightY = scaleInput(rightY);
+        drivetrain->setMotorSpeeds({scaledLeftY, scaledRightY});
     }
 }
 
