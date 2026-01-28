@@ -12,16 +12,14 @@ inline double gear_ratio = 3.0/4.0;
 inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // Motor Groups
-inline pros::MotorGroup rightMotors({16, -18, 17});
-inline pros::MotorGroup leftMotors({-14, 15, -13});
-inline pros::MotorGroup intakeMotors({-12 ,19,-20});
-inline pros::MotorGroup bottomIntakemotors({19,20});
-inline pros::Motor top_Intake(12); 
-inline pros::Motor low_intakeR(19);
-inline pros::Motor low_intakeL(20);
+inline pros::MotorGroup rightMotors({7, -8, 9});
+inline pros::MotorGroup leftMotors({-13, 14, -15});
+inline pros::MotorGroup intakeMotors({5,-4,1});
+inline pros::MotorGroup bottomIntakemotors({5,-4});
+inline pros::Motor top_Intake(1); 
 
-inline pros::adi::Pneumatics hood('h',false);
-inline pros::adi::Pneumatics scooper('g',false);
+inline pros::adi::Pneumatics hood('a',false);
+inline pros::adi::Pneumatics odomRetract('b',false);
 // Drivetrain
 inline DifferentialDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
 
