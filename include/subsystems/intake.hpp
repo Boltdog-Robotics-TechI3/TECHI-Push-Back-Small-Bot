@@ -22,3 +22,9 @@ void setHoodPos(bool upward);
 
 // Set the position of the lift structure
 void setLiftPos(bool upward);
+
+// Set the position of the loader piston
+void setLoaderPos(bool upward);
+
+// Sets the speed of the indexer motor to the specified parameter
+void setIndexerSpeed(int speed);
