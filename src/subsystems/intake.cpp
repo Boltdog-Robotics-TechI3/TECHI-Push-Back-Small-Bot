@@ -5,6 +5,10 @@ bool lowOrHighForwards = true;
 void intakeInitialize() {
     intake1.set_brake_mode(MOTOR_BRAKE_COAST);
     intake2.set_brake_mode(MOTOR_BRAKE_COAST);
+    //controller.clear();
+    pros::delay(100);
+    intakeStatus();
+    pros::delay(100);
 }
 
 void intakePeriodic() {
@@ -73,9 +77,7 @@ void toggleLoadOrLow(){
     //if (controller.get_digital(DIGITAL_LEFT))
     if (loadOrLowForwards){setloadOrLowForwards(false);}
     else {setloadOrLowForwards(true);}
-    //controller.clear();
-    //controller.print(0,0, "port 8 : %b", getloadOrLowForwards());
-    //pros::delay(100);
+    intakeStatus();
     
 }
 
@@ -83,9 +85,8 @@ void togglelowOrHigh(){
     //if (controller.get_digital(DIGITAL_RIGHT))
     if (lowOrHighForwards){setlowOrHighForwards(false);}
     else {setlowOrHighForwards(true);}
-    //controller.clear();
-    //controller.print(0,0, "port 3 : %b", getlowOrHigh());
-    //pros::delay(100);
+    intakeStatus();
+    
     
 }
 
@@ -102,4 +103,9 @@ bool getlowOrHigh(){
 
 void setlowOrHighForwards(bool stuff){
     lowOrHighForwards = stuff;
+}
+
+void intakeStatus(){
+    controller.print(0,0, "Front: %d Mid: %d", getloadOrLowForwards(),getlowOrHigh());
+    pros::delay(100);
 }
