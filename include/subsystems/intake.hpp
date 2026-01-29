@@ -17,14 +17,5 @@ void setLiftSpeed(int speed);
 // Sets the speed of the selector motor to the specified parameter
 void setSelectorSpeed(int speed);
 
-// Set the position of the hood cover
-void setHoodPos(bool upward);
-
-// Set the position of the lift structure
-void setLiftPos(bool upward);
-
-// Set the position of the loader piston
-void setLoaderPos(bool upward);
-
 // Sets the speed of the indexer motor to the specified parameter
 void setIndexerSpeed(int speed);

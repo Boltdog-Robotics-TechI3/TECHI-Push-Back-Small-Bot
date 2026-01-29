@@ -8,30 +8,38 @@ void intakeInitialize() {
 }
 
 void intakePeriodic() {
-	if (controller.get_digital(DIGITAL_R1)) { // Intaking
+	if (controller.get_digital(DIGITAL_L1)) { // Intaking
+        hoodPiston.retract();
+        liftPiston.extend();
         setIntakeSpeed(127);
         setLiftSpeed(65);
         setSelectorSpeed(127);
         setIndexerSpeed(127);
 		
     } 
-    else if (controller.get_digital(DIGITAL_R2)) { // Eject blocks
+    else if (controller.get_digital(DIGITAL_L2)) { // Eject blocks
+        hoodPiston.retract();
+        liftPiston.extend();
         setIntakeSpeed(-100);
         setLiftSpeed(-65);
         setSelectorSpeed(-65);
         setIndexerSpeed(-65);
     } 
-    else if (controller.get_digital(DIGITAL_L2)) { // Scoring
+    else if (controller.get_digital(DIGITAL_R2)) { // Scoring High
+        hoodPiston.extend();
+        liftPiston.retract();
         setIntakeSpeed(127);
         setLiftSpeed(127);
         setSelectorSpeed(127);
         setIndexerSpeed(127);
     } 
-    else if (controller.get_digital(DIGITAL_L1)) { // Scoring mid intake side
+    else if (controller.get_digital(DIGITAL_R1)) { // Scoring Mid
+        hoodPiston.extend();
+        liftPiston.extend();
         setIntakeSpeed(127);
-        setLiftSpeed(-127);
-        setSelectorSpeed(-127);
-        setIndexerSpeed(-127);
+        setLiftSpeed(127);
+        setSelectorSpeed(127);
+        setIndexerSpeed(127);
     } 
     else { // Idle
         setIntakeSpeed(0);
@@ -41,17 +49,17 @@ void intakePeriodic() {
     }
     
     if(controller.get_digital(DIGITAL_UP)){
-        setLiftPos(false);
+        liftPiston.retract();
     }
     else if (controller.get_digital(DIGITAL_DOWN)){
-        setLiftPos(true);
+        liftPiston.extend();
     }
 
     if(controller.get_digital(DIGITAL_B)){
-        setLoaderPos(false);
+        loaderPiston.retract();
     }
     else if (controller.get_digital(DIGITAL_X)){
-        setLoaderPos(true);
+        loaderPiston.extend();
     }
 }
 
@@ -69,16 +77,4 @@ void setLiftSpeed(int speed) {
 
 void setIndexerSpeed(int speed) {
     indexerMotor.move(speed);
-}
-
-void setHoodPos(bool upward) {
-    hoodPiston.set_value(upward);
-}
-
-void setLiftPos(bool upward) {
-    liftPiston.set_value(upward);
-}
-
-void setLoaderPos(bool upward) {
-    loaderPiston.set_value(upward);
 }
