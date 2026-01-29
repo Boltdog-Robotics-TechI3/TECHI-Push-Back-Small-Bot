@@ -296,6 +296,52 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
     drivetrain->setMotorSpeeds({0, 0});
 }
 
+void DifferentialChassis::moveDistance(double distance) {
+    if (!lateralPID || !turnPID) {
+        return;
+    }
+    lateralPID->reset();
+
+    Timer timeoutTimer(5000, +[]() { Chassis::isAtSetpoint = true; });
+    Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeErrorTimer(2000, +[]() { Chassis::isAtSetpoint = true; });
+
+    timeoutTimer.start();
+    double initialPosition = odometry ? odometry->getReadings()[0] : (drivetrain->getMotors()[0]->get_position() + drivetrain->getMotors()[1]->get_position()) / 2.0;
+
+    while (!isAtSetpoint) {
+        double currentPosition = odometry ? odometry->getReadings()[0] : (drivetrain->getMotors()[0]->get_position() + drivetrain->getMotors()[1]->get_position()) / 2.0;
+
+        if (lateralPID->isInSmallErrorRange()) {
+            if (!smallErrorTimer.isRunning()) {
+                smallErrorTimer.start();
+            }
+        } else {
+            smallErrorTimer.stop();
+        }
+
+        if (lateralPID->isInLargeErrorRange()) {
+            if (!largeErrorTimer.isRunning()) {
+                largeErrorTimer.start();
+            }
+        } else {
+            largeErrorTimer.stop();
+        }
+
+        int output = lateralPID->calculate(currentPosition-initialPosition, distance);
+
+        drivetrain->setMotorSpeeds({output, output});
+
+        pros::delay(20);
+    }
+
+    timeoutTimer.stop();
+    smallErrorTimer.stop();
+    largeErrorTimer.stop();
+
+    stop();
+}
+
 /**
  * @brief Turn the robot to a specific angle using PID control.
  * 0 Degrees is facing "forward" from the starting orientation.
@@ -303,6 +349,10 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
  * @param targetAngle The target angle to turn to (in degrees), from 0 to 360. Turns to the right will be decreasing angle
  */
 void DifferentialChassis::turnAngle(double targetAngle) {
+    if (!turnPID) {
+        return;
+    }
+
     isAtSetpoint = false;
 
     Timer timeout(5000, +[]() { Chassis::isAtSetpoint = true; }); 
@@ -316,8 +366,6 @@ void DifferentialChassis::turnAngle(double targetAngle) {
     turnPID->setIZone(.5);
 
     timeout.start();
-
-    std::cout << pose->getTheta() << std::endl;
 
     while (!isAtSetpoint) {
         double error = Pose::degToRad(targetAngle) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
