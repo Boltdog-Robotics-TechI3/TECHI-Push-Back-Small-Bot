@@ -26,8 +26,8 @@ inline DifferentialDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diamet
 
 // Tracking Wheel
 inline pros::IMU imu(11);
-inline TrackingWheel horizontalTrackingWheel(-2, 2.08, 0, WheelPosition::BACK);
-inline TrackingWheel verticalTrackingWheel(-1, 2.08, 0.25, WheelPosition::LEFT);
+inline TrackingWheel horizontalTrackingWheel(-2, 2.08, -4.375, WheelPosition::BACK);
+inline TrackingWheel verticalTrackingWheel(-1, 2.08, 0, WheelPosition::LEFT);
 
 // Odometry
 inline Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &imu);

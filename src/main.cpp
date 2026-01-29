@@ -58,8 +58,14 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
-	while (true) {
+void opcontrol()
+{
+	while(true) {
+		int throttle = controller.get_analog(ANALOG_LEFT_Y);
+		int turn = controller.get_analog(ANALOG_RIGHT_X);
+		chassis.arcade(throttle,turn);
+		intakePeriodic();
 		pros::delay(20);
+		
 	}
 }
