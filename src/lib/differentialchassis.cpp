@@ -221,9 +221,6 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
             int output = turnPID->calculate(-1 * error, 0);
             drivetrain->setMotorSpeeds({-output, output});
 
-            std::cout << "Error: " << turnPID->getError() << std::endl;
-            // std::cout << "Output: " << output << std::endl;
-
             if (turnPID->isInSmallErrorRange()) {
                 smallTimerTurn.start();
             }
@@ -242,8 +239,6 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
         largeTimerTurn.stop();
         timeoutTurn.stop();
         drivetrain->setMotorSpeeds({0, 0});
-
-        std::cout << "END" << std::endl;
     }
     
     // Drive to Pose
@@ -273,8 +268,6 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
         int output = lateralPID->calculate(error, 0) + alignPID->calculate(pose->getTheta(), currentAngle);
         output *= isForward ? 1 : -1;   
         drivetrain->setMotorSpeeds({output, output});
-
-        std::cout << "Error: " << lateralPID->getError() << std::endl;
 
         if (lateralPID->isInSmallErrorRange()) {
             smallTimer.start();
@@ -338,8 +331,6 @@ void DifferentialChassis::turnAngle(double targetAngle) {
         int output = turnPID->calculate(-1 * error, 0);
         drivetrain->setMotorSpeeds({-output, output});
 
-        std::cout << "Error: " << turnPID->getError() << std::endl;
-
         if (turnPID->isInSmallErrorRange()) {
             smallTimer.start();
         }
@@ -358,8 +349,4 @@ void DifferentialChassis::turnAngle(double targetAngle) {
     largeTimer.stop();
     timeout.stop();
     drivetrain->setMotorSpeeds({0, 0});
-
-
-
-    std::cout << "END" << std::endl;
 }
