@@ -27,6 +27,7 @@ inline pros::Motor bottomRollers(-15);
 inline pros::Motor loadOrLow(8);
 inline pros::Motor lowOrHigh(6);
 inline pros::Motor hopper(-7);
+inline pros::adi::Pneumatics wing('A',true);
 
 inline HolonomicDrivetrain drivetrain(&frontLeftDrive, &frontRightDrive, &backLeftDrive, &backRightDrive, wheelDiameter, trackWidth, gearRatio);
 

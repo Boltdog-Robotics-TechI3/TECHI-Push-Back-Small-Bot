@@ -81,6 +81,7 @@ void opcontrol(void);
 #include "util/timer.hpp"
 #include "globals.hpp"
 #include "subsystems/intake.hpp"
+#include "subsystems/descore.hpp"
 
 #endif
 

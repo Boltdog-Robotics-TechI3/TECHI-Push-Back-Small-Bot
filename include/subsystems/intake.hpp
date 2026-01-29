@@ -20,3 +20,5 @@ void intakePeriodic();
 
 // Sets the speed of the intake motor to the specified parameter
 void setIntakeSpeed(int speed);
+
+void intakeStatus();
