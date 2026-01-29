@@ -1,5 +1,4 @@
 #include "main.h"
-#include "main.h"
 
 
 // Bot measurements
@@ -33,9 +32,6 @@ PIDController align(30, 0, 0);
 
 // Chassis
 DifferentialChassis chassis(&drivetrain, &odometry, &lateral, &turn, &align);
-
-// Pure Pursuit Controller
-PurePursuitController autoBuilder(&chassis, 6, 5.0); 
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -79,49 +75,6 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-		
-	// Trajectory testTrajectory = TrajectoryGenerator::generateTrajectory({
-	// 	Pose(0, 0, Pose::degToRad(0)),
-	// 	Pose(-5, 15, Pose::degToRad(0)),
-	// 	// Pose(6, 18, Pose::degToRad(0)),
-	// 	Pose(5, 28, Pose::degToRad(-90))
-	// });
-	// intakeMotors.move(100);
-	// Trajectory testTrajectory = TrajectoryGenerator::generateTrajectory({
-	// 	Pose(0, 0, Pose::degToRad(0)),
-	// 	// Pose(6, 18, Pose::degToRad(0)),
-	// 	Pose(0, 24, Pose::degToRad(-45)),
-	// 	Pose(-48, 36, Pose::degToRad(-45)),
-	// 	// Pose(-52, 60, Pose::degToRad(0)),
-	// 	Pose(-54, 100, Pose::degToRad(0)),
-	// 	// Pose(6, 80, Pose::degToRad(135)),
-	// 	// Pose(12, 36, Pose::degToRad(180))
-
-	// });
-
-	// Trajectory testBackwardsTrajectory = TrajectoryGenerator::generateTrajectory({
-	// 	Pose(-54, 100, Pose::degToRad(0)),
-	// 	Pose(-48, 36, Pose::degToRad(-45)),
-	// 	Pose(0, 24, Pose::degToRad(-45)),
-	// 	Pose(0, 0, Pose::degToRad(0))
-	// });
-
-	// Trajectory testBackwardsTrajectory = TrajectoryGenerator::generateTrajectory({
-	// 	Pose(0, 0, Pose::degToRad(0)),
-	// 	Pose(12, -24, Pose::degToRad(-45)),
-	// 	Pose(24, -36, Pose::degToRad(0)),
-	// 	// Pose(0, 0, Pose::degToRad(0))
-	// });
-
-	// chassis.moveToPose(Pose(-24, 36, 0));
-	// autoBuilder.followPath(testTrajectory, true);
-	// autoBuilder.reset();
-	// pros::delay(500);
-	// autobuilder.reset();
-	// autobuilder.followPath(testBackwardsTrajectory, false);
-
-	// chassis.driveToY(35);
-	// pros::delay(200);
 	chassis.turnThenMoveToPose(Pose(0, 34, 0));
 	pros::delay(200);
 	std::cout << chassis.getPose().to_string() << std::endl;
@@ -138,22 +91,6 @@ void autonomous() {
 	std::cout << chassis.getPose().to_string() << std::endl;
 	chassis.turnThenMoveToPose(Pose(-15, 37, 0));
 	pros::delay(200);
-
-	// chassis.turnAngle(315);
-
-	// chassis.turnThenMoveToPose(Pose(3, 2, 0));
-	// pros::delay(200);
-
-
-
-	// chassis.turnAngle(-90);
-	// pros::delay(20);
-	// chassis.turnAngle(180);
-	// pros::delay(20);																						
-	// chassis.turnAngle(-140);
-	// pros::delay(20);
-	// chassis.turnAngle(20);
-
 }
 
 /**
@@ -185,28 +122,6 @@ void opcontrol() {
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
 			autonomous();
 		}
-
-		// if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-		// 	intakeMotors.move(-100);
-		// 	ejectorMotor.move(-100);
-		// } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-		// 	intakeMotors.move(100);
-		// 	ejectorMotor.move(0);
-		// } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-		// 	intakeMotors.move(100);
-		// 	ejectorMotor.move(100);
-		// } else {
-		// 	intakeMotors.move(0);
-		// 	ejectorMotor.move(0);
-		// }
-
-		// if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-		// 	hood.extend();
-		// } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-		// 	hood.retract();
-		// }
-
-
 
 		pros::delay(20);
 	}
