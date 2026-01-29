@@ -72,7 +72,7 @@ void opcontrol() {
 			gyro.tare();
 		}
 		
-		chassis.fieldCentricDrive(leftX, leftY, -rightX);
+		chassis.fieldCentricDrive(leftX, leftY, rightX);
 
 		pros::delay(20);
 	}
