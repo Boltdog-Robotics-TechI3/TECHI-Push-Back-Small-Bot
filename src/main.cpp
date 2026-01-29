@@ -1,37 +1,41 @@
 #include "main.h"
+#include "main.h"
+
 
 // Bot measurements
-double wheel_diameter = 3.25;
-double track_width = 10.75;
-double gear_ratio = 3.0/4.0;
+float wheel_diameter = 3.25;
+float track_width = 12.5;
+float gear_ratio = 3.0/4.0;
 
 // Controller
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // Motor Groups
-pros::MotorGroup rightMotors({16, 17, -18});
-pros::MotorGroup leftMotors({-13, -14, 15});
-pros::MotorGroup intakeMotors({-19, 20});
-pros::Motor ejectorMotor(-12);
-
-// Pneumatics
-pros::adi::Pneumatics hood('H', false);
+pros::MotorGroup rightMotors({11, 12, -13});
+pros::MotorGroup leftMotors({18, -19, -20});
 
 // Drivetrain
 DifferentialDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
 
 // Tracking Wheel
-pros::IMU imu(11);
-TrackingWheel horizontalTrackingWheel(2, 2.08, 0, WheelPosition::BACK);
-TrackingWheel verticalTrackingWheel(1, 2.08, 0.25, WheelPosition::LEFT);
+pros::IMU imu(15);
+
+TrackingWheel horizontalTrackingWheel(-17, 2.08, -1, WheelPosition::BACK);
+TrackingWheel verticalTrackingWheel(-16, 2.08, 1.875, WheelPosition::LEFT);
 
 // Odometry
-Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &imu);
+Odometry odometry(&verticalTrackingWheel, nullptr, &horizontalTrackingWheel, &imu);
+
+// Chassis PID Controllers
+PIDController lateral(8, 0, 0.1); 
+PIDController turn(60, 0.2, 3);
+PIDController align(30, 0, 0);
 
 // Chassis
-DifferentialChassis chassis(&drivetrain, &odometry, new PIDController(3, 0.0, 0.3), new PIDController(30, 0.0, 0.0));
+DifferentialChassis chassis(&drivetrain, &odometry, &lateral, &turn, &align);
 
-PurePursuitController autobuilder(&chassis, 12);
+// Pure Pursuit Controller
+PurePursuitController autoBuilder(&chassis, 6, 5.0); 
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -40,8 +44,9 @@ PurePursuitController autobuilder(&chassis, 12);
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	imu.reset(true);
 	chassis.reset();
+	chassis.setPose(0, 0, Pose::degToRad(0));
+	chassis.startTracking();
 }
 
 /**
@@ -74,7 +79,14 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	intakeMotors.move(100);
+		
+	// Trajectory testTrajectory = TrajectoryGenerator::generateTrajectory({
+	// 	Pose(0, 0, Pose::degToRad(0)),
+	// 	Pose(-5, 15, Pose::degToRad(0)),
+	// 	// Pose(6, 18, Pose::degToRad(0)),
+	// 	Pose(5, 28, Pose::degToRad(-90))
+	// });
+	// intakeMotors.move(100);
 	// Trajectory testTrajectory = TrajectoryGenerator::generateTrajectory({
 	// 	Pose(0, 0, Pose::degToRad(0)),
 	// 	// Pose(6, 18, Pose::degToRad(0)),
@@ -94,19 +106,6 @@ void autonomous() {
 	// 	Pose(0, 0, Pose::degToRad(0))
 	// });
 
-	Trajectory testTrajectory = TrajectoryGenerator::generateTrajectory({
-		Pose(0, 0, Pose::degToRad(0)),
-		// Pose(6, 18, Pose::degToRad(0)),
-		Pose(0, 60, Pose::degToRad(60)),
-		Pose(24, 57, Pose::degToRad(90)),
-		// Pose(-52, 60, Pose::degToRad(0)),
-		// Pose(-54, 100, Pose::degToRad(0)),
-		// Pose(6, 80, Pose::degToRad(135)),
-		// Pose(12, 36, Pose::degToRad(180))
-
-
-	});
-
 	// Trajectory testBackwardsTrajectory = TrajectoryGenerator::generateTrajectory({
 	// 	Pose(0, 0, Pose::degToRad(0)),
 	// 	Pose(12, -24, Pose::degToRad(-45)),
@@ -115,14 +114,46 @@ void autonomous() {
 	// });
 
 	// chassis.moveToPose(Pose(-24, 36, 0));
-	autobuilder.followPath(testTrajectory, true);
-	autobuilder.reset();
+	// autoBuilder.followPath(testTrajectory, true);
+	// autoBuilder.reset();
 	// pros::delay(500);
 	// autobuilder.reset();
 	// autobuilder.followPath(testBackwardsTrajectory, false);
 
-	pros::delay(1000);
-	intakeMotors.move(0);
+	// chassis.driveToY(35);
+	// pros::delay(200);
+	chassis.turnThenMoveToPose(Pose(0, 34, 0));
+	pros::delay(200);
+	std::cout << chassis.getPose().to_string() << std::endl;
+
+	chassis.turnThenMoveToPose(Pose(7, 32, 0));
+	pros::delay(200);
+
+	std::cout << chassis.getPose().to_string() << std::endl;
+	chassis.turnThenMoveToPose(Pose(-5, 32, 0), false);
+	pros::delay(200);
+
+	std::cout << chassis.getPose().to_string() << std::endl;
+
+	std::cout << chassis.getPose().to_string() << std::endl;
+	chassis.turnThenMoveToPose(Pose(-15, 37, 0));
+	pros::delay(200);
+
+	// chassis.turnAngle(315);
+
+	// chassis.turnThenMoveToPose(Pose(3, 2, 0));
+	// pros::delay(200);
+
+
+
+	// chassis.turnAngle(-90);
+	// pros::delay(20);
+	// chassis.turnAngle(180);
+	// pros::delay(20);																						
+	// chassis.turnAngle(-140);
+	// pros::delay(20);
+	// chassis.turnAngle(20);
+
 }
 
 /**
@@ -139,6 +170,7 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	controller.clear();
 	while (true) {
 		double leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 		double rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -147,31 +179,32 @@ void opcontrol() {
 
 		chassis.arcade(leftY, rightX);
 
-		controller.print(1, 0, "X: %.2f Y: %.2f H: %.2f", pose.getX(), pose.getY(), Pose::radToDeg(pose.getTheta()));
+		controller.print(0, 0, "%.2f %.2f %.2f", pose.getX(), pose.getY(), Pose::radToDeg(pose.getTheta()));
+		controller.print(1, 0, "Y: %.2f X: %.2f", verticalTrackingWheel.getDistance(), horizontalTrackingWheel.getDistance());
 
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
 			autonomous();
 		}
 
-		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-			intakeMotors.move(-100);
-			ejectorMotor.move(-100);
-		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-			intakeMotors.move(100);
-			ejectorMotor.move(0);
-		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-			intakeMotors.move(100);
-			ejectorMotor.move(100);
-		} else {
-			intakeMotors.move(0);
-			ejectorMotor.move(0);
-		}
+		// if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+		// 	intakeMotors.move(-100);
+		// 	ejectorMotor.move(-100);
+		// } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+		// 	intakeMotors.move(100);
+		// 	ejectorMotor.move(0);
+		// } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+		// 	intakeMotors.move(100);
+		// 	ejectorMotor.move(100);
+		// } else {
+		// 	intakeMotors.move(0);
+		// 	ejectorMotor.move(0);
+		// }
 
-		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-			hood.extend();
-		} else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-			hood.retract();
-		}
+		// if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+		// 	hood.extend();
+		// } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+		// 	hood.retract();
+		// }
 
 
 

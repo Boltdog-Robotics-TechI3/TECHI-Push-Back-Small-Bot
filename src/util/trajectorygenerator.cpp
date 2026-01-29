@@ -70,13 +70,13 @@ std::vector<Pose> TrajectoryGenerator::generateHermiteSpline(Pose startPose, Pos
     std::vector<Pose> result;
 
     // Scale factor for the tangents. Adjust this value to change the "tightness" of the curve.
-    double tangentScale = startPose.distanceTo(endPose) / 2.5; 
+    double tangentScale = startPose.distanceTo(endPose) * 1; 
 
-    double M0[2] = {tangentScale* (std::cos((-1 * startPose.getTheta()) + M_PI_2)),
-                    tangentScale * (std::sin((-1 * startPose.getTheta()) + M_PI_2))};
+    double M0[2] = {tangentScale * (std::cos((startPose.getTheta()) + M_PI_2)),
+                    tangentScale * (std::sin((startPose.getTheta()) + M_PI_2))};
 
-    double M1[2] = {tangentScale * (std::cos((-1 * endPose.getTheta()) + M_PI_2)),
-                    tangentScale * (std::sin((-1 * endPose.getTheta()) + M_PI_2))};
+    double M1[2] = {tangentScale * (std::cos((endPose.getTheta()) + M_PI_2)),
+                    tangentScale * (std::sin((endPose.getTheta()) + M_PI_2))};
 
     double h00, h10, h01, h11, x, y;
 
@@ -104,11 +104,11 @@ std::vector<Pose> TrajectoryGenerator::generateHermiteSpline(Pose startPose, Pos
  * @return A vector of Pose objects representing the generated trajectory.
  */
 Trajectory TrajectoryGenerator::generateTrajectory(std::vector<Pose> waypoints) {
-    std::vector<Pose> result = TrajectoryGenerator::generateHermiteSpline(waypoints[0], waypoints[1], 20);
+    std::vector<Pose> result = TrajectoryGenerator::generateHermiteSpline(waypoints[0], waypoints[1], 50);
     std::vector<Pose> temp;
     
     for (int i = 1; i < waypoints.size() - 1; i++) {
-        temp = TrajectoryGenerator::generateHermiteSpline(waypoints[i], waypoints[i + 1], 20);
+        temp = TrajectoryGenerator::generateHermiteSpline(waypoints[i], waypoints[i + 1], 50);
         
         result.insert(result.end(), temp.begin(), temp.end());
     }    

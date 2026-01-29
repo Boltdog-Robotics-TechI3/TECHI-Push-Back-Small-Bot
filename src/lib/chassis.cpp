@@ -1,6 +1,8 @@
 #include "lib/chassis.hpp"
 #include <cmath>
 
+std::atomic<bool> Chassis::isAtSetpoint = false; 
+
 /**
  * @brief Scales an input value based on the selected input scaling method.
  * @param input The input value to scale (-127 to 127). 
@@ -82,7 +84,7 @@ void Chassis::reset() {
         drivetrain->setMotorSpeeds({0, 0, 0, 0, 0});
     }
     if (!tracking) {
-        startTracking();
+        trackingLoop();
     }
 }
 
@@ -115,7 +117,7 @@ Pose Chassis::getPose() const {
  * @brief Set the robot's current pose (position and orientation).
  * @param newPose The new pose to set.
  */
-void Chassis::setPose(Pose newPose) { 
+void Chassis::setPose(const Pose& newPose) { 
     *pose = newPose; 
 }
 
@@ -169,7 +171,7 @@ void Chassis::trackPosition() {
     Pose formerPosition = getPose();
 
     // Calculate the change in orientation
-    double delTheta = odometry->getRotationRadians() - formerPosition.getTheta();
+    double delTheta = -1 * odometry->getRotationRadians() - formerPosition.getTheta();
     
     // Calculate local displacement vector
     double deltaDl[2]; 
@@ -189,5 +191,5 @@ void Chassis::trackPosition() {
     deltaD = deltaD.rotate(-1*thetaM);
 
     // Update the position
-    setPose(formerPosition.getX() + deltaD.getX(), formerPosition.getY() - deltaD.getY(), odometry->getRotationRadians());
+    setPose(formerPosition.getX() + deltaD.getX(), formerPosition.getY() + deltaD.getY(), -1 * odometry->getRotationRadians());
 }

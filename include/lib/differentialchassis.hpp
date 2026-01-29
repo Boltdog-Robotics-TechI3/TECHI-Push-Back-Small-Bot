@@ -13,11 +13,12 @@ class DifferentialChassis : public Chassis {
          * @brief Construct a new DifferentialChassis object with full odometry and autonomous capabilities.
          * @param drivetrain Pointer to the differential drivetrain.
          * @param odometry Pointer to the odometry.
-         * @param lateralPID Pointer to the lateral PID controller.
-         * @param turnPID Pointer to the turn PID controller.
+         * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
+         * @param turnPID Pointer to the turn PID controller, used for rotation.
+         * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        DifferentialChassis(DifferentialDrivetrain *drivetrain, Odometry *odometry, PIDController *lateralPID, PIDController *turnPID)
-        : Chassis(drivetrain, odometry, lateralPID, turnPID) {}
+        DifferentialChassis(DifferentialDrivetrain *drivetrain, Odometry *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
+        : Chassis(drivetrain, odometry, lateralPID, turnPID, alignPID) {}
 
         /**
          * @brief Construct a new DifferentialChassis object with a drivetrain and odometry. 
@@ -32,11 +33,12 @@ class DifferentialChassis : public Chassis {
          * @brief Construct a new DifferentialChassis object with a drivetrain and PID controllers. 
          * This DifferentialChassis will not have odometry capabilities, but will have basic autonomous capabilities.
          * @param drivetrain Pointer to the differential drivetrain.
-         * @param lateralPID Pointer to the lateral PID controller.
-         * @param turnPID Pointer to the turn PID controller.
+         * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
+         * @param turnPID Pointer to the turn PID controller, used for rotation.
+         * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        DifferentialChassis(DifferentialDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID) 
-        : Chassis(drivetrain, lateralPID, turnPID) {}
+        DifferentialChassis(DifferentialDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID) 
+        : Chassis(drivetrain, lateralPID, turnPID, alignPID) {}
 
         /**
          * @brief Construct a new DifferentialChassis object with only a drivetrain. 
@@ -72,7 +74,7 @@ class DifferentialChassis : public Chassis {
          * @param targetPose The target pose to move to.
          * @param isForward Whether the robot should move forward (true) or backward (false) to the target pose.
          */
-        void moveToPoseStep(Pose targetPose, bool isForward = true) override;
+        void moveToPoseStep(const Pose& targetPose, bool isForward = true) override;
 
         /**
          * @brief Move the robot to a specific position using PID control. This method blocks until the target position is reached.
@@ -82,7 +84,28 @@ class DifferentialChassis : public Chassis {
          * @param targetPose The target pose to move to.
          * @param isForward Whether the robot should move forward (true) or backward (false) to the target pose.
          */
-        void moveToPose(Pose targetPose, bool isForward = true) override;
+        void moveToPose(const Pose& targetPose, bool isForward = true) override;
+
+        /**
+         * @brief Drives the robot until its x coordinate matches the given target
+         * 
+         * @param x the x coordinate to drive to, in inches
+         */
+        void driveToX(double x);
+
+        /**
+         * @brief Drives the robot until its x coordinate matches the given target
+         * 
+         * @param x the x coordinate to drive to, in inches
+         */
+        void driveToY(double y);
+
+        /**
+         * @brief Turns to face the pose, then drives in a straight line to the pose.
+         * 
+         * @param targetPose the pose to drive to
+         */
+        void turnThenMoveToPose(const Pose& targetPose, const bool isForward = true);
 
         /**
          * @brief Turn the robot to a specific angle using PID control.

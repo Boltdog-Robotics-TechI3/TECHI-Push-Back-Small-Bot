@@ -8,11 +8,12 @@
 class PurePursuitController {
     private:
         int lookAheadDistance; // in inches
+        float tolerance; // in inches
         int currentWaypointIndex = 0;
         Chassis *chassis; // Pointer to the chassis controller for robot movement
 
     public:
-        PurePursuitController(Chassis *chassis, int lookAheadDistance = 12)
+        PurePursuitController(Chassis *chassis, int lookAheadDistance = 12, float tolerance = 1)
         : chassis(chassis), lookAheadDistance(lookAheadDistance) {}
 
         void reset();
