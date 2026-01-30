@@ -108,10 +108,18 @@ class DifferentialChassis : public Chassis {
         void turnThenMoveToPose(const Pose& targetPose, const bool isForward = true);
 
         /**
+         * @brief Drive the robot a specified distance. Positive distance drives forwards,
+         * negative distance drives backwards.
+         * 
+         * @param distance the distance to drive in inches.
+         */
+        void moveDistance(double distance, int timeout);
+
+        /**
          * @brief Turn the robot to a specific angle using PID control.
          * 0 Degrees is facing "forward" from the starting orientation.
          * 
          * @param targetAngle The target angle to turn to (in degrees).
          */
-        void turnAngle(double targetAngle) override;
+        void turnAngle(double targetAngle, int timeout) override;
 };
