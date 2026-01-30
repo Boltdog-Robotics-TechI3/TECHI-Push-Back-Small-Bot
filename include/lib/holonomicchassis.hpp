@@ -112,5 +112,5 @@ class HolonomicChassis : public Chassis {
          * 
          * @param targetAngle The target angle to turn to (in degrees).
          */
-        void turnAngle(double targetAngle) override;
+        void turnAngle(double targetAngle, int timeout) override;
 };
