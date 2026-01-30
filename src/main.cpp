@@ -6,7 +6,9 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize() {
+	chassis.reset();
+}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -37,7 +39,9 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	chassis.startTracking();
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -54,9 +58,10 @@ void autonomous() {}
  */
 void opcontrol() {
 	int leftY, rightX;
-	bool sometimes = true;
 
-	while (sometimes) {
+	controller.clear();
+
+	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
 		rightX = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(leftY, rightX);

@@ -29,11 +29,11 @@ inline pros::adi::Pneumatics hoodPiston('D', false);
 inline pros::adi::Pneumatics loaderPiston('C', false);
 
 // Odometry Pieces
-inline TrackingWheel verticalTrackingWheel(7, 2, 0, WheelPosition::LEFT);
-inline TrackingWheel horizontalTrackingWheel(6, 2, 0, WheelPosition::BACK);
+inline TrackingWheel verticalTrackingWheel(-17, 2.08, 1.875, WheelPosition::LEFT);
+inline TrackingWheel horizontalTrackingWheel(-16, 2.08, -1, WheelPosition::BACK);
 
-inline pros::IMU gyro(7);
+inline pros::IMU imu(15);
 
-inline Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &gyro);
+inline Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &imu);
 
 inline DifferentialChassis chassis(&drivetrain, &odometry);
