@@ -92,6 +92,53 @@ void HolonomicChassis::moveToPose(const Pose& targetPose, bool isForward) {
  * 
  * @param targetAngle The target angle to turn to (in degrees).
  */
-void HolonomicChassis::turnAngle(double targetAngle) {
-    // TODO: Implement TurnAngle for HolonomicChassis
+void HolonomicChassis::turnAngle(double targetAngle, int timeout) {
+    if (!turnPID) {
+        return;
+    }
+
+    isAtSetpoint = false;
+
+    Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; }); 
+    Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
+
+    turnPID->reset();
+    turnPID->setOutputLimits(-45, 45);
+    turnPID->setSmallErrorRange(0.02);
+    turnPID->setLargeErrorRange(0.08);
+    turnPID->setIZone(.5);
+
+    timeoutTimer.start();
+
+    while (!isAtSetpoint) {
+        double error = Pose::degToRad(targetAngle) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
+        if (error > M_PI) {
+            error = error - 2*M_PI;
+        } 
+        else if (error < -M_PI) {
+            error = 2*M_PI + error;
+        }
+
+        int output = turnPID->calculate(-1 * error, 0);
+        drivetrain->setMotorSpeeds({output, output, output, output});
+
+        if (turnPID->isInSmallErrorRange()) {
+            smallTimer.start();
+        }
+        else if (turnPID->isInLargeErrorRange()) {
+            smallTimer.stop();
+            largeTimer.start();
+        }
+        else {
+            smallTimer.stop();
+            largeTimer.stop();
+        }
+
+        pros::delay(20);
+    }
+    smallTimer.stop();
+    largeTimer.stop();
+    timeoutTimer.stop();
+    drivetrain->setMotorSpeeds({0, 0});
 }

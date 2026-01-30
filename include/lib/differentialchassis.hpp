@@ -113,7 +113,7 @@ class DifferentialChassis : public Chassis {
          * 
          * @param distance the distance to drive in inches.
          */
-        void moveDistance(double distance);
+        void moveDistance(double distance, int timeout);
 
         /**
          * @brief Turn the robot to a specific angle using PID control.
@@ -121,5 +121,5 @@ class DifferentialChassis : public Chassis {
          * 
          * @param targetAngle The target angle to turn to (in degrees).
          */
-        void turnAngle(double targetAngle) override;
+        void turnAngle(double targetAngle, int timeout) override;
 };

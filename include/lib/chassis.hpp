@@ -5,6 +5,7 @@
 #include "pid.hpp"
 #include "util/pose.hpp"
 #include "pros/rtos.hpp"
+#include "util/timer.hpp"
 
 class Chassis {
     protected:
@@ -194,5 +195,5 @@ class Chassis {
          * 
          * @param targetAngle The target angle to turn to (in degrees).
          */
-        void virtual turnAngle(double targetAngle) = 0;
+        void virtual turnAngle(double targetAngle, int timeout) = 0;
 };

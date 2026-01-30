@@ -1,7 +1,6 @@
 #include <cmath>
 #include "lib/differentialchassis.hpp"
 #include "pros/rtos.hpp"
-#include "util/timer.hpp"
 
 /**
  * @brief Move the robot in arcade mode. The left joystick controls the forward/backward movement, and the right joystick controls the rotation.
@@ -296,18 +295,33 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
     drivetrain->setMotorSpeeds({0, 0});
 }
 
-void DifferentialChassis::moveDistance(double distance) {
+/**
+ * @brief Drive the robot a specified distance. Positive distance drives forwards,
+ * negative distance drives backwards.
+ * 
+ * @param distance the distance to drive in inches.
+ */
+void DifferentialChassis::moveDistance(double distance, int timeout) {
     if (!lateralPID || !turnPID) {
         return;
     }
     lateralPID->reset();
 
-    Timer timeoutTimer(5000, +[]() { Chassis::isAtSetpoint = true; });
+    Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; });
     Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
     Timer largeErrorTimer(2000, +[]() { Chassis::isAtSetpoint = true; });
 
     timeoutTimer.start();
     double initialPosition = odometry ? odometry->getReadings()[0] : (drivetrain->getMotors()[0]->get_position() + drivetrain->getMotors()[1]->get_position()) / 2.0;
+    
+    lateralPID->reset();
+    alignPID->reset();
+
+    lateralPID->setOutputLimits(-50, 50);
+    lateralPID->setSmallErrorRange(1);
+    lateralPID->setLargeErrorRange(2);
+
+    alignPID->setOutputLimits(-10, 10);
 
     while (!isAtSetpoint) {
         double currentPosition = odometry ? odometry->getReadings()[0] : (drivetrain->getMotors()[0]->get_position() + drivetrain->getMotors()[1]->get_position()) / 2.0;
@@ -348,14 +362,14 @@ void DifferentialChassis::moveDistance(double distance) {
  * 
  * @param targetAngle The target angle to turn to (in degrees), from 0 to 360. Turns to the right will be decreasing angle
  */
-void DifferentialChassis::turnAngle(double targetAngle) {
+void DifferentialChassis::turnAngle(double targetAngle, int timeout) {
     if (!turnPID) {
         return;
     }
 
     isAtSetpoint = false;
 
-    Timer timeout(5000, +[]() { Chassis::isAtSetpoint = true; }); 
+    Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; }); 
     Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
     Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
 
@@ -365,7 +379,7 @@ void DifferentialChassis::turnAngle(double targetAngle) {
     turnPID->setLargeErrorRange(0.08);
     turnPID->setIZone(.5);
 
-    timeout.start();
+    timeoutTimer.start();
 
     while (!isAtSetpoint) {
         double error = Pose::degToRad(targetAngle) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
@@ -395,6 +409,6 @@ void DifferentialChassis::turnAngle(double targetAngle) {
     }
     smallTimer.stop();
     largeTimer.stop();
-    timeout.stop();
+    timeoutTimer.stop();
     drivetrain->setMotorSpeeds({0, 0});
 }
