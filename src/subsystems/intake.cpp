@@ -17,7 +17,7 @@ void intakeInitialize() {
     colorSorter.set_current_limit(500);
     bottomRollers.set_current_limit(500);
     loadOrLow.set_current_limit(500);
-    loadOrHigh.set_current_limit(500);
+    lowOrHigh.set_current_limit(500);
 }
 
 void intakePeriodic() {
