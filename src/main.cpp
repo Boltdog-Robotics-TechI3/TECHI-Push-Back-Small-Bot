@@ -1,4 +1,4 @@
-#include "main.h"
+#include "globals.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -6,7 +6,9 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize() {
+	initializeScreen();
+}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -52,8 +54,26 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+bool maybe = true;
 void opcontrol() {
-	while (true) {
+	int leftX;
+	int leftY;
+	int rightX;
+
+	while (maybe) {
+		leftX = controller.get_analog(ANALOG_LEFT_X);
+		leftY = controller.get_analog(ANALOG_LEFT_Y);
+		rightX = controller.get_analog(ANALOG_RIGHT_X);
+
+		intakePeriodic();
+		wingPeriodic();
+
+		if(controller.get_digital(DIGITAL_X)){
+			gyro.tare();
+		}
+		
+		chassis.fieldCentricDrive(leftX, leftY, rightX);
+
 		pros::delay(20);
 	}
 }
