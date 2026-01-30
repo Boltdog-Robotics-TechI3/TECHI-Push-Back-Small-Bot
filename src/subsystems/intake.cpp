@@ -18,7 +18,7 @@ void intakePeriodic()
     // }
     if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
     {
-        bottomIntakemotors.move(-127);
+        bottomIntakeMotors.move(-127);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
     {
@@ -28,17 +28,23 @@ void intakePeriodic()
     intakeMotors.move(127);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-    bottomIntakemotors.move(127);
+    bottomIntakeMotors.move(127);
     }
     else {
         intakeMotors.move(0);
-        bottomIntakemotors.move(0);
+        bottomIntakeMotors.move(0);
     }
-    if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
-        hood.extend();
-    }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
-        hood.retract();
+    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)){
+        hood.toggle();
+    }
+    if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)){
+        odomRetract.toggle();
 
     }
-
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
+        deScore.toggle();
+    }
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
+        MatchLoader.toggle();
+    }
 }

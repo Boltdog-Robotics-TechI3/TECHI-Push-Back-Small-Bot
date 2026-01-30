@@ -8,10 +8,12 @@
  */
 void initialize()
 {
+
 	initializeScreen();
 	imu.reset(true);
 	chassis.reset();
 	intakeInitialize();
+	chassis.startTracking();
 }
 
 /**
@@ -43,7 +45,34 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {			
+			chassis.moveDistance(29,1500);
+			chassis.turnAngle(270,1500);
+			MatchLoader.extend();
+			hood.extend();
+			bottomIntakeMotors.move(-127);
+			chassis.moveDistance(1000,3400);
+			// wiggle(40);
+
+			// wiggle(40);
+			// wiggle(40);
+			chassis.moveDistance(1500,1500);
+			// wiggle(40);
+			// wiggle(40);
+			pros::delay(2500);
+			bottomIntakeMotors.move(0);
+			chassis.moveDistance(-5,500);
+			chassis.turnAngle(-350,1500);
+
+			MatchLoader.retract();
+			chassis.moveDistance(40,2000);
+			intakeMotors.move(-127);
+			pros::delay(2000);
+			intakeMotors.move(0);
+
+
+
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -58,6 +87,16 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+void wiggle(int speed){
+	for(int i=0; i<20; i++)
+	leftMotors.move(speed+5);
+	rightMotors.move(-speed);
+	pros::delay(100);	
+	leftMotors.move(-speed);
+	rightMotors.move(speed+5);
+	pros::delay(100);
+}
+ 
 void opcontrol()
 {
 	while(true) {
@@ -65,7 +104,8 @@ void opcontrol()
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(throttle,turn);
 		intakePeriodic();
+		controller.set_text(0,0,chassis.getPose().to_string());
 		pros::delay(20);
-		
+
 	}
 }
