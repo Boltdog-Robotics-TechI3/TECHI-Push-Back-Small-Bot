@@ -9,6 +9,15 @@ void intakeInitialize() {
     pros::delay(100);
     intakeStatus();
     pros::delay(100);
+
+    
+    intake1.set_current_limit(500);
+    intake2.set_current_limit(500);
+    midRoller.set_current_limit(500);
+    colorSorter.set_current_limit(500);
+    bottomRollers.set_current_limit(500);
+    loadOrLow.set_current_limit(500);
+    loadOrHigh.set_current_limit(500);
 }
 
 void intakePeriodic() {
