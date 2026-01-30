@@ -25,15 +25,20 @@ inline pros::Motor indexerMotor(-9);
 inline pros::Motor selectorMotor(10);
 
 inline pros::adi::Pneumatics liftPiston('A', false);
-inline pros::adi::Pneumatics hoodPiston('D', false);
+inline pros::adi::Pneumatics hoodPiston('E', false);
 inline pros::adi::Pneumatics loaderPiston('C', false);
+inline pros::adi::Pneumatics wingPiston('D', false);
 
 // Odometry Pieces
-inline TrackingWheel verticalTrackingWheel(-17, 2.08, 1.875, WheelPosition::LEFT);
-inline TrackingWheel horizontalTrackingWheel(-16, 2.08, -1, WheelPosition::BACK);
+inline TrackingWheel verticalTrackingWheel(-16, 2.08, 1.875, WheelPosition::LEFT);
+inline TrackingWheel horizontalTrackingWheel(-17, 2.08, -1, WheelPosition::BACK);
 
 inline pros::IMU imu(15);
 
 inline Odometry odometry(&verticalTrackingWheel, NULL, &horizontalTrackingWheel, &imu);
 
-inline DifferentialChassis chassis(&drivetrain, &odometry);
+inline PIDController Lateral(8,0,.1);
+inline PIDController Turn(60,0.2,0);
+inline PIDController Align(30,0,0);
+
+inline DifferentialChassis chassis(&drivetrain, &odometry ,&Lateral, &Turn, &Align);

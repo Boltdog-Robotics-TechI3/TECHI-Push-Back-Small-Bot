@@ -301,7 +301,9 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
  * 
  * @param distance the distance to drive in inches.
  */
-void DifferentialChassis::moveDistance(double distance, int timeout) {
+void DifferentialChassis::moveDistance(double distance, int timeout, int maxSpeed) {
+    isAtSetpoint = false;
+
     if (!lateralPID || !turnPID) {
         return;
     }
@@ -317,7 +319,7 @@ void DifferentialChassis::moveDistance(double distance, int timeout) {
     lateralPID->reset();
     alignPID->reset();
 
-    lateralPID->setOutputLimits(-50, 50);
+    lateralPID->setOutputLimits(-maxSpeed, maxSpeed);
     lateralPID->setSmallErrorRange(1);
     lateralPID->setLargeErrorRange(2);
 

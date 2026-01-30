@@ -19,3 +19,11 @@ void setSelectorSpeed(int speed);
 
 // Sets the speed of the indexer motor to the specified parameter
 void setIndexerSpeed(int speed);
+
+void startIntake();
+
+void moveBallPath(int intakeSpeed, int liftSpeed, int selectorSpeed, int indexerSpeed);
+
+void stopScoreHigh();
+
+void startDejam();

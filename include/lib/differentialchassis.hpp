@@ -113,7 +113,7 @@ class DifferentialChassis : public Chassis {
          * 
          * @param distance the distance to drive in inches.
          */
-        void moveDistance(double distance, int timeout);
+        void moveDistance(double distance, int timeout, int maxSpeed = 50);
 
         /**
          * @brief Turn the robot to a specific angle using PID control.

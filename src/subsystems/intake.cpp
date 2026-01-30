@@ -48,27 +48,33 @@ void intakePeriodic() {
 
     if (controller.get_digital_new_press(DIGITAL_R1)) {
         hoodPiston.extend();
-        liftPiston.retract();
+        liftPiston.extend();
     }
     
     if (controller.get_digital_new_press(DIGITAL_R2)) {
         hoodPiston.extend();
-        liftPiston.extend();
-    }
-
-    if(controller.get_digital(DIGITAL_UP)){
         liftPiston.retract();
     }
-    else if (controller.get_digital(DIGITAL_DOWN)){
+
+    if(controller.get_digital_new_press(DIGITAL_UP)){
+        liftPiston.retract();
+    }
+    else if (controller.get_digital_new_press(DIGITAL_DOWN)){
         liftPiston.extend();
     }
 
-    if(controller.get_digital(DIGITAL_B)){
+    if(controller.get_digital_new_press(DIGITAL_B)){
         loaderPiston.retract();
     }
-    else if (controller.get_digital(DIGITAL_X)){
+    else if (controller.get_digital_new_press(DIGITAL_X)){
         loaderPiston.extend();
     }
+
+    if(controller.get_digital_new_press(DIGITAL_Y)){
+        wingPiston.toggle();
+    }
+
+
 }
 
 void setIntakeSpeed(int speed) {
@@ -85,4 +91,12 @@ void setLiftSpeed(int speed) {
 
 void setIndexerSpeed(int speed) {
     indexerMotor.move(speed);
+}
+
+
+void moveBallPath(int intakeSpeed, int liftSpeed, int selectorSpeed, int indexerSpeed){
+    setIntakeSpeed(intakeSpeed);
+    setLiftSpeed(liftSpeed);
+    setSelectorSpeed(selectorSpeed);
+    setIndexerSpeed(indexerSpeed);
 }
