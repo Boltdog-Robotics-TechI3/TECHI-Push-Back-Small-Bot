@@ -27,7 +27,6 @@ inline pros::Motor selectorMotor(10);
 inline pros::adi::Pneumatics liftPiston('A', false);
 inline pros::adi::Pneumatics hoodPiston('E', false);
 inline pros::adi::Pneumatics loaderPiston('C', false);
-inline pros::adi::Pneumatics wingPiston('D', false);
 
 // Odometry Pieces
 inline TrackingWheel verticalTrackingWheel(-16, 2.08, 1.875, WheelPosition::LEFT);

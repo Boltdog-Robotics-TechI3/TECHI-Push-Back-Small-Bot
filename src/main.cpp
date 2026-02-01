@@ -26,6 +26,7 @@ void pulseIntake(int fDelay, int bDelay,int intakeSpeed,int outtakeSpeed, int cy
  */
 void initialize() {
 	chassis.reset();
+	chassis.setInputScale(Chassis::InputScale::SINSQUARED);
 }
 
 /**
@@ -59,57 +60,53 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.startTracking();
-	chassis.moveDistance(33,10000,100);
-	loaderPiston.extend();
+	chassis.moveDistance(30, 10000,100);
+	// loaderPiston.extend();
 	chassis.turnAngle(-90, 5000);
-	moveBallPath(127,65,127,127); //intake from loader
-	chassis.moveDistance(11,1000, 30);
-	wiggle(20);
-	chassis.turnAngle(-90,3000);
-	moveBallPath(0,0,0,0);
+
+	// moveBallPath(127,65,127,127); //intake from loader
+	// chassis.moveDistance(11,1000, 30);
+	// wiggle(20);
+	// chassis.turnAngle(-90,3000);
+	// moveBallPath(0,0,0,0);
 	chassis.moveDistance(-30,3000, 30);
-	moveBallPath(0,0,0,0);
-	moveBallPath(0,-40,-40,-40); // dejam before scoring
+	// moveBallPath(0,0,0,0);
+	// moveBallPath(0,-40,-40,-40); // dejam before scoring
 	pros::delay(250);
 	hoodPiston.extend();
 	pulseIntake(350,50,127,-60,5); // score in long goal
 	moveBallPath(127,127,127,127);
 	pros::delay(1000);
 	moveBallPath(0,0,0,0);
-	chassis.moveDistance(15, 3000, 50);
-	chassis.turnAngle(-45,3000);
-	moveBallPath(127,-100,-100,-100); // outtake blue cubes
-	hoodPiston.retract();
-	pros::delay(2500);
-	moveBallPath(0,0,0,0);
-	chassis.turnAngle(-85,3000);
-	moveBallPath(127,65,127,127); //intake from loader after refill
-	chassis.moveDistance(12,3000);
-	wiggle(20);
-	chassis.turnAngle(-85,3000);
-	moveBallPath(0,0,0,0);
-	chassis.moveDistance(-30,3000, 30);
-	moveBallPath(0,0,0,0);
-	moveBallPath(0,-40,-40,-40); // dejam before scoring
-	pros::delay(250);
-	hoodPiston.extend();
-	pulseIntake(350,50,127,-60,15); // score in long goal
-	moveBallPath(127,127,127,127);
-	pros::delay(1000);
-	moveBallPath(0,0,0,0);
-	loaderPiston.retract();
-	wingPiston.extend();
-	chassis.moveDistance(12,1000,30);
-	chassis.turnAngle(-135,3000);
-	chassis.moveDistance(-18,3000,30);
-	chassis.turnAngle(-82,3000);
-	wingPiston.extend();
-	liftPiston.extend();
-	hoodPiston.retract();
-	chassis.moveDistance(-20,3000,75);
-
-
-	
+	// chassis.moveDistance(15, 3000, 50);
+	// chassis.turnAngle(-45,3000);
+	// moveBallPath(127,-100,-100,-100); // outtake blue cubes
+	// hoodPiston.retract();
+	// pros::delay(2500);
+	// moveBallPath(0,0,0,0);
+	// chassis.turnAngle(-85,3000);
+	// moveBallPath(127,65,127,127); //intake from loader after refill
+	// chassis.moveDistance(12,3000);
+	// wiggle(20);
+	// chassis.turnAngle(-85,3000);
+	// moveBallPath(0,0,0,0);
+	// chassis.moveDistance(-30,3000, 30);
+	// moveBallPath(0,0,0,0);
+	// moveBallPath(0,-40,-40,-40); // dejam before scoring
+	// pros::delay(250);
+	// hoodPiston.extend();
+	// pulseIntake(350,50,127,-60,15); // score in long goal
+	// moveBallPath(127,127,127,127);
+	// pros::delay(1000);
+	// moveBallPath(0,0,0,0);
+	// loaderPiston.retract();
+	// chassis.moveDistance(12,1000,30);
+	// chassis.turnAngle(-135,3000);
+	// chassis.moveDistance(-18,3000,30);
+	// chassis.turnAngle(-82,3000);
+	// liftPiston.extend();
+	// hoodPiston.retract();
+	// chassis.moveDistance(-20,3000,75);
 }
 
 /**
@@ -128,7 +125,7 @@ void autonomous() {
 void opcontrol() {
 	int leftY, rightX;
 
-	controller.clear();
+	// controller.clear();
 
 	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
@@ -137,9 +134,9 @@ void opcontrol() {
 
 		intakePeriodic();
 
-		if(controller.get_digital_new_press(DIGITAL_A)){
-			autonomous();
-		}
+		// if(controller.get_digital_new_press(DIGITAL_A)){
+		// 	autonomous();
+		// }
 
 		pros::delay(20);
 	}

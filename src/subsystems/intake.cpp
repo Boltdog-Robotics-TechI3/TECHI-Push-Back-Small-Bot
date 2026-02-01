@@ -1,5 +1,5 @@
 #include "main.h"
-// brandon forge sucks at programming 
+
 void intakeInitialize() {
     intakeMotor.set_brake_mode(MOTOR_BRAKE_COAST);
     selectorMotor.set_brake_mode(MOTOR_BRAKE_COAST);
@@ -43,7 +43,7 @@ void intakePeriodic() {
 
     if (controller.get_digital_new_press(DIGITAL_L1) || controller.get_digital_new_press(DIGITAL_L2)) {
         hoodPiston.retract();
-        liftPiston.extend();
+        // liftPiston.extend();
     }
 
     if (controller.get_digital_new_press(DIGITAL_R1)) {
@@ -59,22 +59,30 @@ void intakePeriodic() {
     if(controller.get_digital_new_press(DIGITAL_UP)){
         liftPiston.retract();
     }
+
     else if (controller.get_digital_new_press(DIGITAL_DOWN)){
         liftPiston.extend();
     }
 
-    if(controller.get_digital_new_press(DIGITAL_B)){
-        loaderPiston.retract();
-    }
-    else if (controller.get_digital_new_press(DIGITAL_X)){
-        loaderPiston.extend();
+    if (controller.get_digital_new_press(DIGITAL_B)){
+        if (loaderPiston.is_extended()) {
+            loaderPiston.retract();
+        }
+        else {
+            liftPiston.retract();
+            loaderPiston.extend();
+        }
+  
     }
 
-    if(controller.get_digital_new_press(DIGITAL_Y)){
-        wingPiston.toggle();
+    if (loaderPiston.is_extended()) {
+        liftPiston.extend();
     }
 
-
+    
+    // else if (controller.get_digital_new_press(DIGITAL_X)){
+    //     loaderPiston.extend();
+    // }
 }
 
 void setIntakeSpeed(int speed) {
