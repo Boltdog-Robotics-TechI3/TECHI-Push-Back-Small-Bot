@@ -46,12 +46,12 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {			
-			chassis.moveDistance(29,1500);
+			chassis.moveDistance(16,1500);
 			chassis.turnAngle(270,1500);
 			MatchLoader.extend();
-			hood.extend();
+			hood.extend(); 
 			bottomIntakeMotors.move(-127);
-			chassis.moveDistance(1000,3400);
+			chassis.moveDistance(900,3400);
 			// wiggle(40);
 
 			// wiggle(40);
@@ -65,9 +65,9 @@ void autonomous() {
 			chassis.turnAngle(-350,1500);
 
 			MatchLoader.retract();
-			chassis.moveDistance(40,2000);
+			chassis.moveDistance(35,2000);
 			intakeMotors.move(-127);
-			pros::delay(2000);
+			pros::delay(2500);
 			intakeMotors.move(0);
 
 
