@@ -3,9 +3,9 @@
 #include "pros/rotation.hpp"
 
 enum class WheelPosition {
-    LEFT,
-    RIGHT,
-    BACK
+    VERTICAL,
+    HORIZONTAL,
+    DIAGONAL
 };
 
 class TrackingWheel {

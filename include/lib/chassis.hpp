@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include "drivetrain.hpp"
-#include "odometry.hpp"
+#include "odom_sensors.hpp"
 #include "pid.hpp"
 #include "util/pose.hpp"
 #include "pros/rtos.hpp"
@@ -10,7 +10,7 @@
 class Chassis {
     protected:
         Drivetrain *drivetrain;
-        Odometry *odometry;
+        OdomSensors *odometry;
 
         Pose *pose;
         PIDController *lateralPID;
@@ -70,7 +70,7 @@ class Chassis {
          * @param turnPID Pointer to the turn PID controller, used for rotation.
          * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        Chassis(Drivetrain *drivetrain, Odometry *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
+        Chassis(Drivetrain *drivetrain, OdomSensors *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
         : drivetrain(drivetrain), odometry(odometry), lateralPID(lateralPID), turnPID(turnPID), alignPID(alignPID), pose(new Pose()) {}
 
         /**
@@ -79,7 +79,7 @@ class Chassis {
          * @param drivetrain Pointer to the drivetrain.
          * @param odometry Pointer to the odometry.
          */
-        Chassis(Drivetrain *drivetrain, Odometry *odometry)
+        Chassis(Drivetrain *drivetrain, OdomSensors *odometry)
         : drivetrain(drivetrain), odometry(odometry), lateralPID(nullptr), turnPID(nullptr), alignPID(nullptr), pose(new Pose()) {}
 
         /**

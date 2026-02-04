@@ -2,9 +2,9 @@
 
 #include <array>
 #include "pros/imu.hpp"
-#include "trackingwheel.hpp"
+#include "tracking_wheel.hpp"
 
-class Odometry {
+class OdomSensors {
     private:   
         TrackingWheel *leftWheel;
         TrackingWheel *rightWheel;
@@ -20,7 +20,7 @@ class Odometry {
          * @param backWheel Pointer to the back tracking wheel.
          * @param imu Pointer to the IMU sensor.
          */
-        Odometry(TrackingWheel *leftWheel, TrackingWheel *rightWheel, TrackingWheel *backWheel, pros::IMU *imu)
+        OdomSensors(TrackingWheel *leftWheel, TrackingWheel *rightWheel, TrackingWheel *backWheel, pros::IMU *imu)
         : leftWheel(leftWheel), rightWheel(rightWheel), backWheel(backWheel), imu(imu) {}
 
         /**
@@ -29,19 +29,19 @@ class Odometry {
          * @param rightWheel Pointer to the right tracking wheel.
          * @param backWheel Pointer to the back tracking wheel.
          */
-        Odometry(TrackingWheel *leftWheel, TrackingWheel *rightWheel, TrackingWheel *backWheel) 
+        OdomSensors(TrackingWheel *leftWheel, TrackingWheel *rightWheel, TrackingWheel *backWheel) 
         : leftWheel(leftWheel), rightWheel(rightWheel), backWheel(backWheel), imu(nullptr) {}
 
         /**
          * @brief Construct a new Odometry object with only an IMU.
          * @param imu Pointer to the IMU sensor.
          */
-        Odometry(pros::IMU *imu) : leftWheel(nullptr), rightWheel(nullptr), backWheel(nullptr), imu(imu) {}
+        OdomSensors(pros::IMU *imu) : leftWheel(nullptr), rightWheel(nullptr), backWheel(nullptr), imu(imu) {}
 
         /**
          * @brief Construct a new Odometry object with no sensors.
          */
-        Odometry() : leftWheel(nullptr), rightWheel(nullptr), backWheel(nullptr), imu(nullptr) {}
+        OdomSensors() : leftWheel(nullptr), rightWheel(nullptr), backWheel(nullptr), imu(nullptr) {}
 
         /**
          * @brief Resets all odometry sensors to their initial state.

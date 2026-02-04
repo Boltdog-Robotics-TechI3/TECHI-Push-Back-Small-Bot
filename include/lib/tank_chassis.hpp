@@ -1,51 +1,51 @@
 #pragma once
 
-#include "differentialdrivetrain.hpp"
+#include "tank_drivetrain.hpp"
 #include "chassis.hpp"
-#include "odometry.hpp"
+#include "odom_sensors.hpp"
 #include "pid.hpp"
 #include "util/pose.hpp"
 #include "pros/rtos.hpp"
 
-class DifferentialChassis : public Chassis {
+class TankChassis : public Chassis {
     public:
         /**
-         * @brief Construct a new DifferentialChassis object with full odometry and autonomous capabilities.
-         * @param drivetrain Pointer to the differential drivetrain.
-         * @param odometry Pointer to the odometry.
+         * @brief Construct a new TankChassis object with full odometry and autonomous capabilities.
+         * @param drivetrain Pointer to the Tank drivetrain.
+         * @param odometry Pointer to the Odom Sensors.
          * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
          * @param turnPID Pointer to the turn PID controller, used for rotation.
          * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        DifferentialChassis(DifferentialDrivetrain *drivetrain, Odometry *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
+        TankChassis(TankDrivetrain *drivetrain, OdomSensors *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
         : Chassis(drivetrain, odometry, lateralPID, turnPID, alignPID) {}
 
         /**
-         * @brief Construct a new DifferentialChassis object with a drivetrain and odometry. 
-         * This DifferentialChassis will have full odometry capabilities, but will not have autonomous features.
-         * @param drivetrain Pointer to the differential drivetrain.
+         * @brief Construct a new TankChassis object with a drivetrain and odometry. 
+         * This TankChassis will have full odometry capabilities, but will not have autonomous features.
+         * @param drivetrain Pointer to the Tank drivetrain.
          * @param odometry Pointer to the odometry.
          */
-        DifferentialChassis(DifferentialDrivetrain *drivetrain, Odometry *odometry)
+        TankChassis(TankDrivetrain *drivetrain, OdomSensors *odometry)
         : Chassis(drivetrain, odometry) {}
 
         /**
-         * @brief Construct a new DifferentialChassis object with a drivetrain and PID controllers. 
-         * This DifferentialChassis will not have odometry capabilities, but will have basic autonomous capabilities.
-         * @param drivetrain Pointer to the differential drivetrain.
+         * @brief Construct a new TankChassis object with a drivetrain and PID controllers. 
+         * This TankChassis will not have odometry capabilities, but will have basic autonomous capabilities.
+         * @param drivetrain Pointer to the Tank drivetrain.
          * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
          * @param turnPID Pointer to the turn PID controller, used for rotation.
          * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        DifferentialChassis(DifferentialDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID) 
+        TankChassis(TankDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID) 
         : Chassis(drivetrain, lateralPID, turnPID, alignPID) {}
 
         /**
-         * @brief Construct a new DifferentialChassis object with only a drivetrain. 
-         * This DifferentialChassis will not have odometry capabilities nor autonomous features.
-         * @param drivetrain Pointer to the differential drivetrain.
+         * @brief Construct a new TankChassis object with only a drivetrain. 
+         * This TankChassis will not have odometry capabilities nor autonomous features.
+         * @param drivetrain Pointer to the Tank drivetrain.
          */
-        DifferentialChassis(DifferentialDrivetrain *drivetrain) 
+        TankChassis(TankDrivetrain *drivetrain) 
         : Chassis(drivetrain) {}
 
          /**

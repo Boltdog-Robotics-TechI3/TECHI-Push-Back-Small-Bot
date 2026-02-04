@@ -1,51 +1,51 @@
 #pragma once
 
-#include "holonomicdrivetrain.hpp"
+#include "x_drivetrain.hpp"
 #include "chassis.hpp"
-#include "odometry.hpp"
+#include "odom_sensors.hpp"
 #include "pid.hpp"
 #include "util/pose.hpp"
 #include "pros/rtos.hpp"
 
-class HolonomicChassis : public Chassis {
+class XChassis : public Chassis {
     public:
         /**
-         * @brief Construct a new HolonomicChassis object with full odometry and autonomous capabilities.
-         * @param drivetrain Pointer to the holonomic drivetrain.
+         * @brief Construct a new xChassis object with full odometry and autonomous capabilities.
+         * @param drivetrain Pointer to the x drivetrain.
          * @param odometry Pointer to the odometry.
          * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
          * @param turnPID Pointer to the turn PID controller, used for rotation.
          * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        HolonomicChassis(HolonomicDrivetrain *drivetrain, Odometry *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
+        XChassis(XDrivetrain *drivetrain, OdomSensors *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
         : Chassis(drivetrain, odometry, lateralPID, turnPID, alignPID) {}
 
         /**
-         * @brief Construct a new HolonomicChassis object with a drivetrain and odometry. 
-         * This HolonomicChassis will have full odometry capabilities, but will not have autonomous features.
-         * @param drivetrain Pointer to the holonomic drivetrain.
+         * @brief Construct a new xChassis object with a drivetrain and odometry. 
+         * This xChassis will have full odometry capabilities, but will not have autonomous features.
+         * @param drivetrain Pointer to the x drivetrain.
          * @param odometry Pointer to the odometry.
          */
-        HolonomicChassis(HolonomicDrivetrain *drivetrain, Odometry *odometry)
+        XChassis(XDrivetrain *drivetrain, OdomSensors *odometry)
         : Chassis(drivetrain, odometry) {}
 
         /**
-         * @brief Construct a new HolonomicChassis object with a drivetrain and PID controllers. 
-         * This HolonomicChassis will not have odometry capabilities, but will have basic autonomous capabilities.
-         * @param drivetrain Pointer to the holonomic drivetrain.
+         * @brief Construct a new xChassis object with a drivetrain and PID controllers. 
+         * This XChassis will not have odometry capabilities, but will have basic autonomous capabilities.
+         * @param drivetrain Pointer to the x drivetrain.
          * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
          * @param turnPID Pointer to the turn PID controller, used for rotation.
          * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        HolonomicChassis(HolonomicDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID) 
+        XChassis(XDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID) 
         : Chassis(drivetrain, lateralPID, turnPID, alignPID) {}
 
         /**
-         * @brief Construct a new HolonomicChassis object with only a drivetrain. 
-         * This HolonomicChassis will not have odometry capabilities nor autonomous features.
-         * @param drivetrain Pointer to the holonomic drivetrain.
+         * @brief Construct a new xChassis object with only a drivetrain. 
+         * This xChassis will not have odometry capabilities nor autonomous features.
+         * @param drivetrain Pointer to the x drivetrain.
          */
-        HolonomicChassis(HolonomicDrivetrain *drivetrain) 
+        XChassis(XDrivetrain *drivetrain) 
         : Chassis(drivetrain) {}
 
         /**

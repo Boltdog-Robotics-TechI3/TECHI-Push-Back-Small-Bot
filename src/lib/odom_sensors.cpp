@@ -1,7 +1,7 @@
 #include <cmath>
-#include "lib/odometry.hpp"
+#include "lib/odom_sensors.hpp"
 
-void Odometry::reset() {
+void OdomSensors::reset() {
     if (leftWheel) {
         leftWheel->reset();
     }
@@ -17,7 +17,7 @@ void Odometry::reset() {
     }
 }
 
-std::array<double, 4> Odometry::getReadings() {
+std::array<double, 4> OdomSensors::getReadings() {
     std::array<double, 4> readings = {0.0, 0.0, 0.0, 0.0}; // left, right, back, rotation
     if (leftWheel) {
         readings[0] = leftWheel->getDistance();
@@ -36,21 +36,21 @@ std::array<double, 4> Odometry::getReadings() {
     return readings;
 }
 
-double Odometry::getRotationRadians() {
+double OdomSensors::getRotationRadians() {
     if (imu) {
         return imu->get_rotation() * (M_PI / 180.0); // convert degrees to radians
     }
     return 0.0;
 }
 
-double Odometry::getRotationDegrees() {
+double OdomSensors::getRotationDegrees() {
     if (imu) {
         return imu->get_rotation();
     }
     return 0.0;
 }
 
-double Odometry::getHeadingRadians() {
+double OdomSensors::getHeadingRadians() {
     if (imu) {
         return imu->get_heading();
     }

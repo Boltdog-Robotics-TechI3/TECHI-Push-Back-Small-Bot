@@ -1,5 +1,5 @@
 #include <cmath>
-#include "lib/differentialchassis.hpp"
+#include "lib/tank_chassis.hpp"
 #include "pros/rtos.hpp"
 
 /**
@@ -7,7 +7,7 @@
  * @param leftY The value of the left joystick (forward/backward movement).
  * @param rightX The value of the right joystick (rotation).
  */
-void DifferentialChassis::arcade(int leftY, int rightX) {
+void TankChassis::arcade(int leftY, int rightX) {
     if (drivetrain) {
         int scaledLeftY = scaleInput(leftY);
         int scaledRightX = scaleInput(rightX);
@@ -22,7 +22,7 @@ void DifferentialChassis::arcade(int leftY, int rightX) {
  * @param leftY The value of the left joystick (left side motors).
  * @param rightY The value of the right joystick (right side motors).
  */
-void DifferentialChassis::tank(int leftY, int rightY) {
+void TankChassis::tank(int leftY, int rightY) {
     if (drivetrain) {
         int scaledLeftY = scaleInput(leftY);
         int scaledRightY = scaleInput(rightY);
@@ -41,7 +41,7 @@ void DifferentialChassis::tank(int leftY, int rightY) {
  * 
  * @param targetPose The target pose to move to.
  */
-void DifferentialChassis::moveToPoseStep(const Pose& targetPose, bool isForward) {    
+void TankChassis::moveToPoseStep(const Pose& targetPose, bool isForward) {    
     double linearError = pose->distanceTo(targetPose);
 
     double absTargetAngle = pose->angleTo(targetPose) + (isForward ? 0 : M_PI);
@@ -67,7 +67,7 @@ void DifferentialChassis::moveToPoseStep(const Pose& targetPose, bool isForward)
  * @brief Move the robot to a specific position using PID control.
  * @param targetPose The target pose to move to.
  */
-void DifferentialChassis::moveToPose(const Pose& targetPose, bool isForward) {
+void TankChassis::moveToPose(const Pose& targetPose, bool isForward) {
     lateralPID->reset();
     alignPID->reset();
 
@@ -83,7 +83,7 @@ void DifferentialChassis::moveToPose(const Pose& targetPose, bool isForward) {
  * 
  * @param x the x coordinate to drive to, in inches
  */
-void DifferentialChassis::driveToX(double x) {
+void TankChassis::driveToX(double x) {
     isAtSetpoint = false;
 
     Timer timeout(5000, +[]() { Chassis::isAtSetpoint = true; }); 
@@ -133,7 +133,7 @@ void DifferentialChassis::driveToX(double x) {
  * 
  * @param x the x coordinate to drive to, in inches
  */
-void DifferentialChassis::driveToY(double y) {
+void TankChassis::driveToY(double y) {
     isAtSetpoint = false;
 
     Timer timeout(10000, +[]() { Chassis::isAtSetpoint = true; }); 
@@ -182,7 +182,7 @@ void DifferentialChassis::driveToY(double y) {
  * 
  * @param targetPose the pose to drive to
  */
-void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool isForward) {
+void TankChassis::turnThenMoveToPose(const Pose& targetPose, const bool isForward) {
     double targetAngle = pose->angleTo(targetPose) - (M_PI / 2);
     targetAngle += isForward ? 0 : M_PI;
     
@@ -301,7 +301,7 @@ void DifferentialChassis::turnThenMoveToPose(const Pose& targetPose, const bool 
  * 
  * @param distance the distance to drive in inches.
  */
-void DifferentialChassis::moveDistance(double distance, int timeout) {
+void TankChassis::moveDistance(double distance, int timeout) {
     isAtSetpoint = false;
 
     if (!lateralPID || !turnPID) {
@@ -364,7 +364,7 @@ void DifferentialChassis::moveDistance(double distance, int timeout) {
  * 
  * @param targetAngle The target angle to turn to (in degrees), from 0 to 360. Turns to the right will be decreasing angle
  */
-void DifferentialChassis::turnAngle(double targetAngle, int timeout) {
+void TankChassis::turnAngle(double targetAngle, int timeout) {
     if (!turnPID) {
         return;
     }

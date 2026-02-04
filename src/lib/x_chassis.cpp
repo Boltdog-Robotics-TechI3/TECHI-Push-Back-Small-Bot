@@ -1,5 +1,5 @@
 #include <cmath>
-#include "lib/holonomicchassis.hpp"
+#include "lib/x_chassis.hpp"
 #include "pros/rtos.hpp"
 
 /**
@@ -8,7 +8,7 @@
  * @param transSpeed The translational speed.
  * @param rotSpeed The rotational speed.
  */
-void HolonomicChassis::driveAngle(double angle, int transSpeed, int rotSpeed) {
+void XChassis::driveAngle(double angle, int transSpeed, int rotSpeed) {
 	double adjustedAngle = angle;
 	int x = cos(adjustedAngle) * transSpeed;
 	int y = sin(adjustedAngle) * transSpeed;
@@ -25,7 +25,7 @@ void HolonomicChassis::driveAngle(double angle, int transSpeed, int rotSpeed) {
  * @param leftY The y-value of the left joystick.
  * @param rightX The x-value of the right joystick.
  */
-void HolonomicChassis::fieldCentricDrive(int leftX, int leftY, int rightX) {
+void XChassis::fieldCentricDrive(int leftX, int leftY, int rightX) {
     double y = (double)leftY;
     double x = (double)leftX;
     double r = scaleInput(rightX);
@@ -42,7 +42,7 @@ void HolonomicChassis::fieldCentricDrive(int leftX, int leftY, int rightX) {
  * @param leftY The y-value of the left joystick.
  * @param rightX The x-value of the right joystick.
  */
-void HolonomicChassis::robotCentricDrive(int leftX, int leftY, int rightX) {
+void XChassis::robotCentricDrive(int leftX, int leftY, int rightX) {
     double y = (double)leftY;
     double x = (double)leftX;
     double r = scaleInput(rightX);
@@ -61,7 +61,7 @@ void HolonomicChassis::robotCentricDrive(int leftX, int leftY, int rightX) {
  *  @param rightX The x-value of the right joystick.
  * @param rightY The y-value of the right joystick.
  */
-void HolonomicChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int rightY) {
+void XChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int rightY) {
     double y = (double)leftY;
     double x = (double)leftX;
 
@@ -82,8 +82,8 @@ void HolonomicChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX
  * @brief Move the robot to a specific position using PID control.
  * @param targetPose The target pose to move to.
  */
-void HolonomicChassis::moveToPose(const Pose& targetPose, bool isForward) {
-    // TODO: Implement MoveTo for HolonomicChassis
+void XChassis::moveToPose(const Pose& targetPose, bool isForward) {
+    // TODO: Implement MoveTo for XChassis
 }
 
 /**       
@@ -92,7 +92,7 @@ void HolonomicChassis::moveToPose(const Pose& targetPose, bool isForward) {
  * 
  * @param targetAngle The target angle to turn to (in degrees).
  */
-void HolonomicChassis::turnAngle(double targetAngle, int timeout) {
+void XChassis::turnAngle(double targetAngle, int timeout) {
     if (!turnPID) {
         return;
     }
@@ -140,5 +140,5 @@ void HolonomicChassis::turnAngle(double targetAngle, int timeout) {
     smallTimer.stop();
     largeTimer.stop();
     timeoutTimer.stop();
-    drivetrain->setMotorSpeeds({0, 0});
+    drivetrain->setMotorSpeeds({0, 0, 0, 0});
 }
