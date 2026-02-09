@@ -1,5 +1,5 @@
 #include <cmath>
-#include "lib/holonomicchassis.hpp"
+#include "lib/x_chassis.hpp"
 #include "pros/rtos.hpp"
 
 /**
@@ -8,7 +8,7 @@
  * @param transSpeed The translational speed.
  * @param rotSpeed The rotational speed.
  */
-void HolonomicChassis::driveAngle(double angle, int transSpeed, int rotSpeed) {
+void XChassis::driveAngle(double angle, int transSpeed, int rotSpeed) {
 	double adjustedAngle = angle;
 	int x = cos(adjustedAngle) * transSpeed;
 	int y = sin(adjustedAngle) * transSpeed;
@@ -25,7 +25,7 @@ void HolonomicChassis::driveAngle(double angle, int transSpeed, int rotSpeed) {
  * @param leftY The y-value of the left joystick.
  * @param rightX The x-value of the right joystick.
  */
-void HolonomicChassis::fieldCentricDrive(int leftX, int leftY, int rightX) {
+void XChassis::fieldCentricDrive(int leftX, int leftY, int rightX) {
     double y = (double)leftY;
     double x = (double)leftX;
     double r = scaleInput(rightX);
@@ -42,7 +42,7 @@ void HolonomicChassis::fieldCentricDrive(int leftX, int leftY, int rightX) {
  * @param leftY The y-value of the left joystick.
  * @param rightX The x-value of the right joystick.
  */
-void HolonomicChassis::robotCentricDrive(int leftX, int leftY, int rightX) {
+void XChassis::robotCentricDrive(int leftX, int leftY, int rightX) {
     double y = (double)leftY;
     double x = (double)leftX;
     double r = scaleInput(rightX);
@@ -61,7 +61,7 @@ void HolonomicChassis::robotCentricDrive(int leftX, int leftY, int rightX) {
  *  @param rightX The x-value of the right joystick.
  * @param rightY The y-value of the right joystick.
  */
-void HolonomicChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int rightY) {
+void XChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int rightY) {
     double y = (double)leftY;
     double x = (double)leftX;
 
@@ -77,13 +77,60 @@ void HolonomicChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX
 	driveAngle(targetDriveAngle + odometry->getRotationRadians(), speed, r);
 }
 
-
 /**
  * @brief Move the robot to a specific position using PID control.
+ * 
+ * @note This method will obey the angle of the target pose while driving to the x and y coordinates.
+ * 
  * @param targetPose The target pose to move to.
+ * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
+ * @param maxSpeed The maximum speed the robot can travel, from 0 to 127
  */
-void HolonomicChassis::moveToPose(const Pose& targetPose, bool isForward) {
-    // TODO: Implement MoveTo for HolonomicChassis
+#warning TODO: write and test x-drive moveToPose
+void XChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
+    if (!movePID | !turnPID) {
+        return;
+    }
+
+    isAtSetpoint = false;
+
+    float moveError = 0;
+    float turnError = 0;
+    int moveOutput = 0;
+    int turnOutput = 0;
+    float targetAngle = targetPose.getTheta();
+    
+    Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; }); 
+    Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeErrorTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
+
+    movePID->reset();
+    turnPID->reset();
+
+    movePID->setOutputLimits(-maxSpeed, maxSpeed);
+    movePID->setSmallErrorRange(.3);
+    movePID->setLargeErrorRange(1);
+
+    turnPID->setOutputLimits(-40, 40);
+    turnPID->setSmallErrorRange(0.02);
+    turnPID->setLargeErrorRange(0.06);
+
+    timeoutTimer.start();
+
+    while (!isAtSetpoint) {
+        moveError = pose->distanceTo(targetPose);
+        moveOutput = movePID->calculate(0, moveError);
+
+        turnError = targetAngle - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
+        if (turnError > M_PI) {
+            turnError = turnError - 2*M_PI;
+        } 
+        else if (turnError < -M_PI) {
+            turnError = 2*M_PI + turnError;
+        }
+
+        turnOutput = turnPID->calculate(0, turnError);
+    }
 }
 
 /**       
@@ -92,7 +139,7 @@ void HolonomicChassis::moveToPose(const Pose& targetPose, bool isForward) {
  * 
  * @param targetAngle The target angle to turn to (in degrees).
  */
-void HolonomicChassis::turnAngle(double targetAngle, int timeout) {
+void XChassis::turnToAngle(double targetAngle, int timeout) {
     if (!turnPID) {
         return;
     }
@@ -100,8 +147,8 @@ void HolonomicChassis::turnAngle(double targetAngle, int timeout) {
     isAtSetpoint = false;
 
     Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; }); 
-    Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
-    Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeErrorTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
 
     turnPID->reset();
     turnPID->setOutputLimits(-45, 45);
@@ -120,25 +167,25 @@ void HolonomicChassis::turnAngle(double targetAngle, int timeout) {
             error = 2*M_PI + error;
         }
 
-        int output = turnPID->calculate(-1 * error, 0);
+        int output = turnPID->calculate(0, error);
         drivetrain->setMotorSpeeds({output, output, output, output});
 
         if (turnPID->isInSmallErrorRange()) {
-            smallTimer.start();
+            smallErrorTimer.start();
         }
         else if (turnPID->isInLargeErrorRange()) {
-            smallTimer.stop();
-            largeTimer.start();
+            smallErrorTimer.stop();
+            largeErrorTimer.start();
         }
         else {
-            smallTimer.stop();
-            largeTimer.stop();
+            smallErrorTimer.stop();
+            largeErrorTimer.stop();
         }
 
         pros::delay(20);
     }
-    smallTimer.stop();
-    largeTimer.stop();
+    smallErrorTimer.stop();
+    largeErrorTimer.stop();
     timeoutTimer.stop();
-    drivetrain->setMotorSpeeds({0, 0});
+    drivetrain->setMotorSpeeds({0, 0, 0, 0});
 }
