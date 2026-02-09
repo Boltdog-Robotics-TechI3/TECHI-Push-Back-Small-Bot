@@ -13,12 +13,11 @@ class XChassis : public Chassis {
          * @brief Construct a new xChassis object with full odometry and autonomous capabilities.
          * @param drivetrain Pointer to the x drivetrain.
          * @param odometry Pointer to the odometry.
-         * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
+         * @param movePID Pointer to the move PID controller, used for translation movements.
          * @param turnPID Pointer to the turn PID controller, used for rotation.
-         * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        XChassis(XDrivetrain *drivetrain, OdomSensors *odometry, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID)
-        : Chassis(drivetrain, odometry, lateralPID, turnPID, alignPID) {}
+        XChassis(XDrivetrain *drivetrain, OdomSensors *odometry, PIDController *movePID, PIDController *turnPID)
+        : Chassis(drivetrain, odometry, movePID, turnPID) {}
 
         /**
          * @brief Construct a new xChassis object with a drivetrain and odometry. 
@@ -33,12 +32,11 @@ class XChassis : public Chassis {
          * @brief Construct a new xChassis object with a drivetrain and PID controllers. 
          * This XChassis will not have odometry capabilities, but will have basic autonomous capabilities.
          * @param drivetrain Pointer to the x drivetrain.
-         * @param lateralPID Pointer to the lateral PID controller, used for translation movements.
+         * @param movePID Pointer to the move PID controller, used for translation movements.
          * @param turnPID Pointer to the turn PID controller, used for rotation.
-         * @param alignPID Pointer to the align PID Controller, used in conjuction with lateralPID to control the heading.
          */
-        XChassis(XDrivetrain *drivetrain, PIDController *lateralPID, PIDController *turnPID, PIDController *alignPID) 
-        : Chassis(drivetrain, lateralPID, turnPID, alignPID) {}
+        XChassis(XDrivetrain *drivetrain, PIDController *movePID, PIDController *turnPID) 
+        : Chassis(drivetrain, movePID, turnPID) {}
 
         /**
          * @brief Construct a new xChassis object with only a drivetrain. 
@@ -83,34 +81,21 @@ class XChassis : public Chassis {
         void fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int rightY);
         
         /**
-         * @brief Move the robot towards a specific position using a single step of PID control.
-         * 
-         * @note This method is intended to be called repeatedly in a loop until the target position is reached.
-         * Use moveToPose() for a blocking call that handles the loop internally and if the target pose won't change during the loop.
-         * Use this method if your target position may change dynamically.
-         * 
-         * @note This method will obey the angle of the target pose while driving to the x and y coordinates.
-         * 
-         * @param targetPose The target pose to move to.
-         * @param isForward Whether the robot should move forward (true) or backward (false) to the target pose.
-         */
-        void moveToPoseStep(const Pose& targetPose, bool isForward) override;
-
-        /**
          * @brief Move the robot to a specific position using PID control.
          * 
          * @note This method will obey the angle of the target pose while driving to the x and y coordinates.
          * 
          * @param targetPose The target pose to move to.
-         * @param isForward Whether the robot should move forward (true) or backward (false) to the target pose.
+         * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up (default 5 seconds).
          */
-        void moveToPose(const Pose& targetPose, bool isForward) override;
+        void moveToPose(const Pose& targetPose, int timeout = 5000) override;
 
         /**
          * @brief Turn the robot to a specific angle using PID control.
          * 0 Degrees is facing "forward" from the starting orientation.
          * 
          * @param targetAngle The target angle to turn to (in degrees).
+         * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
          */
-        void turnAngle(double targetAngle, int timeout) override;
+        void turnToAngle(double targetAngle, int timeout) override;
 };

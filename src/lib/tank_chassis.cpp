@@ -31,268 +31,83 @@ void TankChassis::tank(int leftY, int rightY) {
 }
 
 /**
- * @brief Move the robot towards a specific position using a single step of PID control.
- * 
- * @note This method is intended to be called repeatedly in a loop until the target position is reached.
- * Use moveToPose() for a blocking call that handles the loop internally and if the target pose won't change during the loop.
- * Use this method if your target position may change dynamically.
+ * @brief Move the robot to a specific position using PID control. This method blocks until the target position is reached.
  * 
  * @note This method ignores the angle of the target pose and only drives to the x and y coordinates.
+ * @note THIS FUNCTION IS NOT A REPLACEMENT FOR TURNING. ALWAYS TURN TO FACE THE TARGET POSE BEFORE USING THIS FUNCTION.
  * 
  * @param targetPose The target pose to move to.
+ * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
  */
-void TankChassis::moveToPoseStep(const Pose& targetPose, bool isForward) {    
-    double linearError = pose->distanceTo(targetPose);
-
-    double absTargetAngle = pose->angleTo(targetPose) + (isForward ? 0 : M_PI);
-    absTargetAngle = absTargetAngle < 0 ? absTargetAngle + M_TWOPI : absTargetAngle;
-    
-    double angularError = absTargetAngle - getWorldFrameHeading();
-    if (angularError > M_PI or angularError < (-1 * M_PI)) {
-        angularError = -1 * std::copysign(1, angularError) * (M_TWOPI - abs(angularError));
+void TankChassis::moveToPose(const Pose& targetPose, int timeout) {
+    if (!movePID || !alignPID) {
+        return;
     }
 
-    double lateralOutput = (lateralPID->calculate(linearError, 0) - 10) * (isForward ? -1 : 1);
-    double turnOutput = -alignPID->calculate(angularError, 0);
+    isAtSetpoint = false;
 
-    // std::cout << "Linear Error: " << linearError << " | Angular Error: " << Pose::radToDeg(angularError) << " | Lateral Output: " << lateralOutput << " | Turn Output: " << turnOutput << std::endl;
-        
-    double leftOutput = lateralOutput - turnOutput;
-    double rightOutput = lateralOutput + turnOutput;
+    float error = 0;
+    float angularError = 0;
+    int linearOutput = 0;
+    int angularOutput = 0;
 
-    tank(leftOutput, rightOutput);
-}
-
-/**
- * @brief Move the robot to a specific position using PID control.
- * @param targetPose The target pose to move to.
- */
-void TankChassis::moveToPose(const Pose& targetPose, bool isForward) {
-    lateralPID->reset();
+    movePID->reset();
     alignPID->reset();
 
-    while (pose->distanceTo(targetPose) > .5) {
-        moveToPoseStep(targetPose, isForward);
+    movePID->setOutputLimits(-50, 50);
+    movePID->setSmallErrorRange(.3);
+    movePID->setLargeErrorRange(1);
 
+    Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; });
+    Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeErrorTimer(2000, +[]() { Chassis::isAtSetpoint = true; });
+
+    timeoutTimer.start();
+    while (!isAtSetpoint) {
+        error = pose->distanceTo(targetPose);
+        linearOutput = movePID->calculate(0, error);
+
+        if (error > minAlignDistance) {
+            // Calculate and normalize the angle error
+            angularError = (pose->angleTo(targetPose) - M_PI_2) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
+            if (angularError > M_PI) {
+                angularError = angularError - 2*M_PI;
+            } 
+            else if (angularError < -M_PI) {
+                angularError = 2*M_PI + angularError;
+            }
+
+            angularOutput = alignPID->calculate(0, angularError);
+
+            drivetrain->setMotorSpeeds({linearOutput - angularOutput, linearOutput + angularOutput});
+            // std::cout << "linear: " << linearOutput << "; align: " << angularOutput << std::endl;
+        }
+        else {
+            drivetrain->setMotorSpeeds({linearOutput, linearOutput});
+        }
+
+        if (movePID->isInSmallErrorRange()) {
+            if (!smallErrorTimer.isRunning()) {
+                smallErrorTimer.start();
+            }
+        } else {
+            smallErrorTimer.stop();
+        }
+        if (movePID->isInLargeErrorRange()) {
+            if (!largeErrorTimer.isRunning()) {
+                largeErrorTimer.start();
+            }
+        } else {
+            largeErrorTimer.stop();
+        }  
+        
 		pros::delay(20);
     }
-}
 
-/**
- * @brief Drives the robot until its x coordinate matches the given target
- * 
- * @param x the x coordinate to drive to, in inches
- */
-void TankChassis::driveToX(double x) {
-    isAtSetpoint = false;
-
-    Timer timeout(5000, +[]() { Chassis::isAtSetpoint = true; }); 
-    Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
-    Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
-
-    double currentAngle = pose->getTheta();
-
-    lateralPID->reset();
-    alignPID->reset();
-
-    lateralPID->setOutputLimits(-70, 70);
-    lateralPID->setSmallErrorRange(1);
-    lateralPID->setLargeErrorRange(2);
-
-    alignPID->setOutputLimits(-10, 10);
-
-    timeout.start();
-
-    while (!isAtSetpoint) {
-        int output = lateralPID->calculate(pose->getX(), x) + alignPID->calculate(pose->getTheta(), currentAngle);
-        drivetrain->setMotorSpeeds({output, output});
-
-        if (lateralPID->isInSmallErrorRange()) {
-            smallTimer.start();
-        }
-        else if (lateralPID->isInLargeErrorRange()) {
-            smallTimer.stop();
-            largeTimer.start();
-        }
-        else {
-            smallTimer.stop();
-            largeTimer.stop();
-        }
-
-        pros::delay(20);
-
-    }
-    smallTimer.stop();
-    largeTimer.stop();
-    timeout.stop();
-    drivetrain->setMotorSpeeds({0, 0});
-}
-
-/**
- * @brief Drives the robot until its x coordinate matches the given target
- * 
- * @param x the x coordinate to drive to, in inches
- */
-void TankChassis::driveToY(double y) {
-    isAtSetpoint = false;
-
-    Timer timeout(10000, +[]() { Chassis::isAtSetpoint = true; }); 
-    Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
-    Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
-
-    double currentAngle = pose->getTheta();
-
-    lateralPID->reset();
-    alignPID->reset();
-
-    lateralPID->setOutputLimits(-70, 70);
-    lateralPID->setSmallErrorRange(1);
-    lateralPID->setLargeErrorRange(2);
-
-    alignPID->setOutputLimits(-10, 10);
-
-    timeout.start();
-
-    while (!isAtSetpoint) {
-        int output = lateralPID->calculate(pose->getY(), y) + alignPID->calculate(pose->getTheta(), currentAngle);
-        drivetrain->setMotorSpeeds({output, output});
-
-        if (lateralPID->isInSmallErrorRange()) {
-            smallTimer.start();
-        }
-        else if (lateralPID->isInLargeErrorRange()) {
-            smallTimer.stop();
-            largeTimer.start();
-        }
-        else {
-            smallTimer.stop();
-            largeTimer.stop();
-        }
-
-        pros::delay(20);
-    }
-    smallTimer.stop();
-    largeTimer.stop();
-    timeout.stop();
-    drivetrain->setMotorSpeeds({0, 0});
-}
-
-/**
- * @brief Turns to face the pose, then drives in a straight line to the pose.
- * 
- * @param targetPose the pose to drive to
- */
-void TankChassis::turnThenMoveToPose(const Pose& targetPose, const bool isForward) {
-    double targetAngle = pose->angleTo(targetPose) - (M_PI / 2);
-    targetAngle += isForward ? 0 : M_PI;
-    
-    // std::cout << "Target Angle: " << targetAngle << std::endl;
-    // std::cout << "Current Angle: " << targetAngle << std::endl;
-    // std::cout << "Error " << fabs(pose->getTheta() - targetAngle) << std::endl;
-
-    // Dynamic Turn Angle
-    if (fabs(pose->getTheta() - targetAngle) > .01) {
-        isAtSetpoint = false;
-
-        Timer timeoutTurn(5000, +[]() { Chassis::isAtSetpoint = true; }); 
-        Timer smallTimerTurn(500, +[]() { Chassis::isAtSetpoint = true; });
-        Timer largeTimerTurn(1500, +[]() { Chassis::isAtSetpoint = true; });
-
-        turnPID->reset();
-        turnPID->setOutputLimits(-45, 45);
-        turnPID->setSmallErrorRange(0.02);
-        turnPID->setLargeErrorRange(0.08);
-        turnPID->setIZone(.5);
-
-        timeoutTurn.start();
-
-        while (!isAtSetpoint) {
-            targetAngle = pose->angleTo(targetPose) - (M_PI / 2);
-            targetAngle += isForward ? 0 : M_PI;
-            double error = targetAngle - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
-            if (error > M_PI) {
-                error = error - 2*M_PI;
-            } 
-            else if (error < -M_PI) {
-                error = 2*M_PI + error;
-            }
-
-            int output = turnPID->calculate(-1 * error, 0);
-            drivetrain->setMotorSpeeds({-output, output});
-
-            if (turnPID->isInSmallErrorRange()) {
-                smallTimerTurn.start();
-            }
-            else if (turnPID->isInLargeErrorRange()) {
-                smallTimerTurn.stop();
-                largeTimerTurn.start();
-            }
-            else {
-                smallTimerTurn.stop();
-                largeTimerTurn.stop();
-            }
-
-            pros::delay(20);
-        }
-        smallTimerTurn.stop();
-        largeTimerTurn.stop();
-        timeoutTurn.stop();
-        drivetrain->setMotorSpeeds({0, 0});
-    }
-    
-    // Drive to Pose
-    isAtSetpoint = false;
-    double lastError = 0;
-
-    Timer timeout(5000, +[]() { Chassis::isAtSetpoint = true; }); 
-    Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
-    Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
-
-    double currentAngle = pose->getTheta();
-
-    lateralPID->reset();
-    alignPID->reset();
-
-    lateralPID->setOutputLimits(-50, 50);
-    lateralPID->setSmallErrorRange(1);
-    lateralPID->setLargeErrorRange(2);
-
-    alignPID->setOutputLimits(-10, 10);
-
-    timeout.start();
-
-    while (!isAtSetpoint) {
-        double error = -1 * pose->distanceTo(targetPose);
-
-        int output = lateralPID->calculate(error, 0) + alignPID->calculate(pose->getTheta(), currentAngle);
-        output *= isForward ? 1 : -1;   
-        drivetrain->setMotorSpeeds({output, output});
-
-        if (lateralPID->isInSmallErrorRange()) {
-            smallTimer.start();
-        }
-        else if (lateralPID->isInLargeErrorRange()) {
-            smallTimer.stop();
-            largeTimer.start();
-        }
-        else {
-            smallTimer.stop();
-            largeTimer.stop();
-        }
-
-        // if we passed the point, just exit
-        if (lastError - error < -0.25) {
-            break; 
-        }
-
-        lastError = error;
-
-        pros::delay(20);
-    }
-    smallTimer.stop();
-    largeTimer.stop();
-    timeout.stop();
-    drivetrain->setMotorSpeeds({0, 0});
+    smallErrorTimer.stop();
+    largeErrorTimer.stop();
+    timeoutTimer.stop();
+    stop();
 }
 
 /**
@@ -302,12 +117,11 @@ void TankChassis::turnThenMoveToPose(const Pose& targetPose, const bool isForwar
  * @param distance the distance to drive in inches.
  */
 void TankChassis::moveDistance(double distance, int timeout) {
-    isAtSetpoint = false;
-
-    if (!lateralPID || !turnPID) {
+    if (!movePID || !alignPID) {
         return;
     }
-    lateralPID->reset();
+
+    isAtSetpoint = false;
 
     Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; });
     Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
@@ -316,35 +130,33 @@ void TankChassis::moveDistance(double distance, int timeout) {
     timeoutTimer.start();
     double initialPosition = odometry ? odometry->getReadings()[0] : (drivetrain->getMotors()[0]->get_position() + drivetrain->getMotors()[1]->get_position()) / 2.0;
     
-    lateralPID->reset();
+    movePID->reset();
     alignPID->reset();
 
-    lateralPID->setOutputLimits(-50, 50);
-    lateralPID->setSmallErrorRange(1);
-    lateralPID->setLargeErrorRange(2);
+    movePID->setOutputLimits(-50, 50);
+    movePID->setSmallErrorRange(1);
+    movePID->setLargeErrorRange(2);
 
     alignPID->setOutputLimits(-10, 10);
 
     while (!isAtSetpoint) {
         double currentPosition = odometry ? odometry->getReadings()[0] : (drivetrain->getMotors()[0]->get_position() + drivetrain->getMotors()[1]->get_position()) / 2.0;
 
-        if (lateralPID->isInSmallErrorRange()) {
-            if (!smallErrorTimer.isRunning()) {
-                smallErrorTimer.start();
-            }
-        } else {
-            smallErrorTimer.stop();
-        }
 
-        if (lateralPID->isInLargeErrorRange()) {
-            if (!largeErrorTimer.isRunning()) {
-                largeErrorTimer.start();
-            }
-        } else {
+        if (movePID->isInSmallErrorRange()) {
+            smallErrorTimer.start();
+        }
+        else if (movePID->isInLargeErrorRange()) {
+            smallErrorTimer.stop();
+            largeErrorTimer.start();
+        }
+        else {
+            smallErrorTimer.stop();
             largeErrorTimer.stop();
         }
 
-        int output = lateralPID->calculate(currentPosition-initialPosition, distance);
+
+        int output = movePID->calculate(currentPosition-initialPosition, distance);
 
         drivetrain->setMotorSpeeds({output, output});
 
@@ -354,17 +166,17 @@ void TankChassis::moveDistance(double distance, int timeout) {
     timeoutTimer.stop();
     smallErrorTimer.stop();
     largeErrorTimer.stop();
-
     stop();
 }
 
 /**
  * @brief Turn the robot to a specific angle using PID control.
- * 0 Degrees is facing "forward" from the starting orientation.
+ * 0 Degrees is facing "forward" from the starting orientation. Counterclockwise is positive
  * 
- * @param targetAngle The target angle to turn to (in degrees), from 0 to 360. Turns to the right will be decreasing angle
+ * @param targetAngle The target angle to turn to (in degrees).
+ * @param timeout The amount of time in milliseconds that the robot will try to reach the angle before giving up
  */
-void TankChassis::turnAngle(double targetAngle, int timeout) {
+void TankChassis::turnToAngle(double targetAngle, int timeout) {
     if (!turnPID) {
         return;
     }
@@ -372,8 +184,8 @@ void TankChassis::turnAngle(double targetAngle, int timeout) {
     isAtSetpoint = false;
 
     Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; }); 
-    Timer smallTimer(500, +[]() { Chassis::isAtSetpoint = true; });
-    Timer largeTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeErrorTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
 
     turnPID->reset();
     turnPID->setOutputLimits(-45, 45);
@@ -392,25 +204,25 @@ void TankChassis::turnAngle(double targetAngle, int timeout) {
             error = 2*M_PI + error;
         }
 
-        int output = turnPID->calculate(-1 * error, 0);
+        int output = turnPID->calculate(0, error);
         drivetrain->setMotorSpeeds({-output, output});
 
         if (turnPID->isInSmallErrorRange()) {
-            smallTimer.start();
+            smallErrorTimer.start();
         }
         else if (turnPID->isInLargeErrorRange()) {
-            smallTimer.stop();
-            largeTimer.start();
+            smallErrorTimer.stop();
+            largeErrorTimer.start();
         }
         else {
-            smallTimer.stop();
-            largeTimer.stop();
+            smallErrorTimer.stop();
+            largeErrorTimer.stop();
         }
 
         pros::delay(20);
     }
-    smallTimer.stop();
-    largeTimer.stop();
+    smallErrorTimer.stop();
+    largeErrorTimer.stop();
     timeoutTimer.stop();
-    drivetrain->setMotorSpeeds({0, 0});
+    stop();
 }

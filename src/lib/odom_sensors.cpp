@@ -2,14 +2,11 @@
 #include "lib/odom_sensors.hpp"
 
 void OdomSensors::reset() {
-    if (leftWheel) {
-        leftWheel->reset();
+    if (verticalWheel) {
+        verticalWheel->reset();
     }
-    if (rightWheel) {
-        rightWheel->reset();
-    }
-    if (backWheel) {
-        backWheel->reset();
+    if (horizontalWheel) {
+        horizontalWheel->reset();
     }
     if (imu) {
         imu->reset(true);
@@ -17,21 +14,16 @@ void OdomSensors::reset() {
     }
 }
 
-std::array<double, 4> OdomSensors::getReadings() {
-    std::array<double, 4> readings = {0.0, 0.0, 0.0, 0.0}; // left, right, back, rotation
-    if (leftWheel) {
-        readings[0] = leftWheel->getDistance();
+std::array<double, 3> OdomSensors::getReadings() {
+    std::array<double, 3> readings = {0.0, 0.0, 0.0}; // vertical, horizontal, rotation
+    if (verticalWheel) {
+        readings[0] = verticalWheel->getDistance();
     }
-    if (rightWheel) {
-        readings[1] = rightWheel->getDistance();
-    }
-    if (backWheel) {
-        readings[2] = backWheel->getDistance();
+    if (horizontalWheel) {
+        readings[1] = horizontalWheel->getDistance();
     }
     if (imu) {
-        readings[3] = imu->get_rotation() * (M_PI / 180.0); // convert degrees to radians
-    } else {
-        readings[3] = 0.0;
+        readings[2] = imu->get_rotation() * (M_PI / 180.0); // convert degrees to radians
     }
     return readings;
 }
