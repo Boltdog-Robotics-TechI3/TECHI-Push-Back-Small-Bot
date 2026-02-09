@@ -87,8 +87,9 @@ class XChassis : public Chassis {
          * 
          * @param targetPose The target pose to move to.
          * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up (default 5 seconds).
+         * @param maxSpeed The maximum speed the robot can travel, from 0 to 127
          */
-        void moveToPose(const Pose& targetPose, int timeout = 5000) override;
+        void moveToPose(const Pose& targetPose, int timeout = 5000, int maxSpeed = 50) override;
 
         /**
          * @brief Turn the robot to a specific angle using PID control.
