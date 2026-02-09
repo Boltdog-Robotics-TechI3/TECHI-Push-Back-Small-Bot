@@ -23,9 +23,11 @@ void intakePeriodic()
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
     {
         intakeMotors.move(-127);
+        bottomIntakeMotors.move(-127);
     }
     else if  (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
     intakeMotors.move(127);
+    bottomIntakeMotors.move(127);
     }
     else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
     bottomIntakeMotors.move(127);
@@ -38,7 +40,7 @@ void intakePeriodic()
         hood.toggle();
     }
     if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)){
-        odomRetract.toggle();
+        //odomRetract.toggle();
 
     }
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){

@@ -102,7 +102,7 @@ void opcontrol()
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
-		chassis.arcade(throttle,turn);
+		chassis.arcade(throttle,-turn);
 		intakePeriodic();
 		controller.set_text(0,0,chassis.getPose().to_string());
 		pros::delay(20);
