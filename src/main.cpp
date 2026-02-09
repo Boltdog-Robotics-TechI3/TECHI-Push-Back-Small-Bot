@@ -60,20 +60,19 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.startTracking();
-	chassis.moveDistance(30, 10000,100);
+	chassis.moveDistance(30, 10000);
 	// loaderPiston.extend();
-	chassis.turnAngle(-90, 5000);
+	chassis.turnToAngle(-90, 5000);
 
 	// moveBallPath(127,65,127,127); //intake from loader
 	// chassis.moveDistance(11,1000, 30);
 	// wiggle(20);
 	// chassis.turnAngle(-90,3000);
 	// moveBallPath(0,0,0,0);
-	chassis.moveDistance(-30,3000, 30);
+	chassis.moveDistance(-30,3000);
 	// moveBallPath(0,0,0,0);
 	// moveBallPath(0,-40,-40,-40); // dejam before scoring
 	pros::delay(250);
-	hoodPiston.extend();
 	pulseIntake(350,50,127,-60,5); // score in long goal
 	moveBallPath(127,127,127,127);
 	pros::delay(1000);
