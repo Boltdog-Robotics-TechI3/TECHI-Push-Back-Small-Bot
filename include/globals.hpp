@@ -23,19 +23,19 @@ inline pros::adi::Pneumatics deScore('h',false);
 inline pros::adi::Pneumatics MatchLoader('f',false);
 //inline pros::adi::Pneumatics odomRetract('h',false); // timmy said he is not using
 // Drivetrain
-inline DifferentialDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
+inline TankDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
 
 
 // Tracking Wheel
 inline pros::IMU imu(6);
-inline TrackingWheel horizontalTrackingWheel(-2, 2.08, -4.375, WheelPosition::BACK);
-inline TrackingWheel verticalTrackingWheel(-10, 2.08, 0, WheelPosition::LEFT);
+inline TrackingWheel horizontalTrackingWheel(-2, 2.08, -4.375, WheelPosition::HORIZONTAL);
+inline TrackingWheel verticalTrackingWheel(-10, 2.08, 0, WheelPosition::VERTICAL);
 
 // Odometry
-inline Odometry odometry(&verticalTrackingWheel, NULL,&horizontalTrackingWheel , &imu);
+inline OdomSensors odometry(&verticalTrackingWheel,&horizontalTrackingWheel , &imu);
 inline PIDController lateral(8,0,0);
 inline PIDController turn(60,0.2,3);
 inline PIDController align(30,0,0);
 // Chassis
-inline DifferentialChassis chassis(&drivetrain, &odometry,&lateral,&turn,&align);
+inline TankChassis chassis(&drivetrain, &odometry,&lateral,&turn,&align);
 
