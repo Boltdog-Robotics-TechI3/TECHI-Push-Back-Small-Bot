@@ -84,16 +84,17 @@ void XChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int ri
  * 
  * @param targetPose The target pose to move to.
  * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
+ * @param maxSpeed The maximum speed the robot can travel, from 0 to 127
  */
 #warning TODO: write and test x-drive moveToPose
-void XChassis::moveToPose(const Pose& targetPose, int timeout) {
+void XChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
     if (!movePID | !turnPID) {
         return;
     }
 
     isAtSetpoint = false;
 
-    float error = 0;
+    float moveError = 0;
     float turnError = 0;
     int moveOutput = 0;
     int turnOutput = 0;
@@ -106,7 +107,7 @@ void XChassis::moveToPose(const Pose& targetPose, int timeout) {
     movePID->reset();
     turnPID->reset();
 
-    movePID->setOutputLimits(-50, 50);
+    movePID->setOutputLimits(-maxSpeed, maxSpeed);
     movePID->setSmallErrorRange(.3);
     movePID->setLargeErrorRange(1);
 
@@ -117,8 +118,8 @@ void XChassis::moveToPose(const Pose& targetPose, int timeout) {
     timeoutTimer.start();
 
     while (!isAtSetpoint) {
-        error = pose->distanceTo(targetPose);
-        moveOutput = movePID->calculate(0, error);
+        moveError = pose->distanceTo(targetPose);
+        moveOutput = movePID->calculate(0, moveError);
 
         turnError = targetAngle - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
         if (turnError > M_PI) {

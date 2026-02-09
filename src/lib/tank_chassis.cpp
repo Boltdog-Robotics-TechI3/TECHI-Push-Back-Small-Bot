@@ -38,13 +38,26 @@ void TankChassis::tank(int leftY, int rightY) {
  * 
  * @param targetPose The target pose to move to.
  * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
+ * @param maxSpeed The maximum speed the robot can travel, from 0 to 127
  */
-void TankChassis::moveToPose(const Pose& targetPose, int timeout) {
+void TankChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
     if (!movePID || !alignPID) {
         return;
     }
 
     isAtSetpoint = false;
+
+    // Calculate starting angular error to determine if robot should drive forwards or backwards
+    float testAngleError = (pose->angleTo(targetPose) - M_PI_2) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
+    if (testAngleError > M_PI) {
+        testAngleError = testAngleError - 2*M_PI;
+    } 
+    else if (testAngleError < -M_PI) {
+        testAngleError = 2*M_PI + testAngleError;
+    }
+
+    // If error is greater than PI/2, we are probably trying to go backwards (hopefully).
+    bool isBackwards = abs(testAngleError) >= M_PI_2;
 
     float error = 0;
     float angularError = 0;
@@ -54,22 +67,23 @@ void TankChassis::moveToPose(const Pose& targetPose, int timeout) {
     movePID->reset();
     alignPID->reset();
 
-    movePID->setOutputLimits(-50, 50);
-    movePID->setSmallErrorRange(.3);
-    movePID->setLargeErrorRange(1);
+    movePID->setOutputLimits(-maxSpeed, maxSpeed);
+    movePID->setSmallErrorRange(.5);
+    movePID->setLargeErrorRange(1.25);
+    movePID->setSlewRate(200);
 
     Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; });
     Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
-    Timer largeErrorTimer(2000, +[]() { Chassis::isAtSetpoint = true; });
+    Timer largeErrorTimer(1000, +[]() { Chassis::isAtSetpoint = true; });
 
     timeoutTimer.start();
     while (!isAtSetpoint) {
         error = pose->distanceTo(targetPose);
-        linearOutput = movePID->calculate(0, error);
+        linearOutput = movePID->calculate(0, error) * (isBackwards ? -1 : 1);
 
         if (error > minAlignDistance) {
             // Calculate and normalize the angle error
-            angularError = (pose->angleTo(targetPose) - M_PI_2) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
+            angularError = (pose->angleTo(targetPose) + (isBackwards ? M_PI : 0) - M_PI_2) - fmod((pose->getTheta() + 2*M_PI), 2*M_PI);
             if (angularError > M_PI) {
                 angularError = angularError - 2*M_PI;
             } 

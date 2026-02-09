@@ -173,9 +173,10 @@ class Chassis {
          * @brief Move the robot to a specific position using PID control.
          * 
          * @param targetPose The target pose to move to.
-         * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
+         * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up.
+         * @param maxSpeed The maximum speed the robot can travel, from 0 to 127.
          */
-        void virtual moveToPose(const Pose& targetPose, int timeout) = 0;
+        void virtual moveToPose(const Pose& targetPose, int timeout, int maxSpeed) = 0;
 
         /**
          * @brief Turn the robot to a specific angle using PID control.
