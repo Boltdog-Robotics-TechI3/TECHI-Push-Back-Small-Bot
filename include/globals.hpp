@@ -12,8 +12,8 @@ inline double gear_ratio = 3.0/4.0;
 inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // Motor Groups
-inline pros::MotorGroup rightMotors({20, -19, 18, -17});
-inline pros::MotorGroup leftMotors({-13, -14, 15, 16});
+inline pros::MotorGroup leftMotors({20, -19, 18, -17});
+inline pros::MotorGroup rightMotors({-13, -14, 15, 16});
 inline pros::MotorGroup intakeMotors({5,-4,1});
 inline pros::MotorGroup bottomIntakeMotors({-2,3});
 inline pros::Motor top_Intake(1); 
@@ -27,9 +27,9 @@ inline TankDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, trac
 
 
 // Tracking Wheel
-inline pros::IMU imu(6);
-inline TrackingWheel horizontalTrackingWheel(-2, 2.08, -4.375, WheelPosition::HORIZONTAL);
-inline TrackingWheel verticalTrackingWheel(-10, 2.08, 0, WheelPosition::VERTICAL);
+inline pros::IMU imu(4);
+inline TrackingWheel horizontalTrackingWheel(-11, 2.08, -4.375, WheelPosition::HORIZONTAL);
+inline TrackingWheel verticalTrackingWheel(12, 2.08, 0, WheelPosition::VERTICAL);
 
 // Odometry
 inline OdomSensors odometry(&verticalTrackingWheel,&horizontalTrackingWheel , &imu);
@@ -38,4 +38,5 @@ inline PIDController turn(60,0.2,3);
 inline PIDController align(30,0,0);
 // Chassis
 inline TankChassis chassis(&drivetrain, &odometry,&lateral,&turn,&align);
+
 

@@ -13,7 +13,7 @@ void initialize()
 	imu.reset(true);
 	chassis.reset();
 	intakeInitialize();
-	chassis.startTracking();
+
 }
 
 /**
@@ -46,29 +46,29 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {			
-			chassis.moveDistance(16,1500);
-			chassis.turnAngle(270,1500);
-			MatchLoader.extend();
-			hood.extend(); 
-			bottomIntakeMotors.move(-127);
-			chassis.moveDistance(900,3400);
-			// wiggle(40);
+			// chassis.moveDistance(16,1500);
+			// chassis.turnAngle(270,1500);
+			// MatchLoader.extend();
+			// hood.extend(); 
+			// bottomIntakeMotors.move(-127);
+			// chassis.moveDistance(900,3400);
+			// // wiggle(40);
 
-			// wiggle(40);
-			// wiggle(40);
-			chassis.moveDistance(1500,1500);
-			// wiggle(40);
-			// wiggle(40);
-			pros::delay(2500);
-			bottomIntakeMotors.move(0);
-			chassis.moveDistance(-5,500);
-			chassis.turnAngle(-350,1500);
+			// // wiggle(40);
+			// // wiggle(40);
+			// chassis.moveDistance(1500,1500);
+			// // wiggle(40);
+			// // wiggle(40);
+			// pros::delay(2500);
+			// bottomIntakeMotors.move(0);
+			// chassis.moveDistance(-5,500);
+			// chassis.turnAngle(-350,1500);
 
-			MatchLoader.retract();
-			chassis.moveDistance(35,2000);
-			intakeMotors.move(-127);
-			pros::delay(2500);
-			intakeMotors.move(0);
+			// MatchLoader.retract();
+			// chassis.moveDistance(35,2000);
+			// intakeMotors.move(-127);
+			// pros::delay(2500);
+			// intakeMotors.move(0);
 
 
 
@@ -99,13 +99,48 @@ void wiggle(int speed){
  
 void opcontrol()
 {
+	chassis.startTracking();
 	while(true) {
+		
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
-		chassis.arcade(throttle,-turn);
+		chassis.arcade(throttle,turn);
 		intakePeriodic();
-		controller.set_text(0,0,chassis.getPose().to_string());
+		controller.set_text(0,0,std::to_string(chassis.getPose().getTheta()));
 		pros::delay(20);
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))
+    {			chassis.turnToAngle(90,1500);
+				chassis.turnToAngle(-90,1500);
+	}
+	if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))
+	
+    {
+    			chassis.moveDistance(16,1500);
+			// chassis.turnToAngle(90,1500);
+			// MatchLoader.extend();
+			// hood.extend(); 
+			// bottomIntakeMotors.move(-127);
+			// chassis.moveDistance(900,3400);
+			// wiggle(40);
+
+
+			// wiggle(40);
+			// wiggle(40);
+			// chassis.moveDistance(1500,1500);
+			// wiggle(40);
+			// wiggle(40);
+			// pros::delay(2500);
+			// bottomIntakeMotors.move(0);
+			// chassis.moveDistance(-5,500);
+			// chassis.turnToAngle(-90,1500);
+
+			// MatchLoader.retract();
+			// chassis.moveDistance(35,2000);
+			// intakeMotors.move(-127);
+			// pros::delay(2500);
+			// intakeMotors.move(0);
+
+    }
 
 	}
 }
