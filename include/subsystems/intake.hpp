@@ -12,7 +12,7 @@ void intakePeriodic();
 void setIntakeSpeed(int speed);
 
 // Sets the speed of the lift motor to the specified parameter
-void setLiftSpeed(int speed);
+void setLeverSpeed(int speed);
 
 // Sets the speed of the selector motor to the specified parameter
 void setSelectorSpeed(int speed);

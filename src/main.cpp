@@ -59,7 +59,7 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	chassis.startTracking();
+	/*chassis.startTracking();
 	chassis.moveDistance(30, 10000);
 	// loaderPiston.extend();
 	chassis.turnToAngle(-90, 5000);
@@ -106,7 +106,7 @@ void autonomous() {
 	// liftPiston.extend();
 	// hoodPiston.retract();
 	// chassis.moveDistance(-20,3000,75);
-}
+*/}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -133,9 +133,9 @@ void opcontrol() {
 
 		intakePeriodic();
 
-		// if(controller.get_digital_new_press(DIGITAL_A)){
-		// 	autonomous();
-		// }
+		 if(controller.get_digital_new_press(DIGITAL_A)){
+		 	autonomous();
+		 }
 
 		pros::delay(20);
 	}
