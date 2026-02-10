@@ -20,16 +20,16 @@ void intakePeriodic() {
 		
     } 
     else if (controller.get_digital(DIGITAL_L2)) { // Eject blocks
-        setIntakeSpeed(-70);
+        setIntakeSpeed(-100);
     } else { // Idle
         setIntakeSpeed(30);
     }
 
 
-    if (controller.get_digital(DIGITAL_X)) { // Scoring High
-        setLeverSpeed(60);  
-    } else  if (controller.get_digital(DIGITAL_Y)) { // Scoring High
-        setLeverSpeed(-50);  
+    if (controller.get_digital(DIGITAL_R2)) { // Scoring High
+        setLeverSpeed(90);  
+    } else  if (controller.get_digital(DIGITAL_R1)) { // Scoring High
+        setLeverSpeed(-75);  
     } else {
         setLeverSpeed(0);
     }
