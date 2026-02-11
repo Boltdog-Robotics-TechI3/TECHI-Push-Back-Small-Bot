@@ -28,14 +28,14 @@ inline TankDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, trac
 
 // Tracking Wheel
 inline pros::IMU imu(4);
-inline TrackingWheel horizontalTrackingWheel(-11, 2.08, -4.375, WheelPosition::HORIZONTAL);
-inline TrackingWheel verticalTrackingWheel(12, 2.08, 0, WheelPosition::VERTICAL);
+inline TrackingWheel horizontalTrackingWheel(-11, 2.08, 3.5, WheelPosition::HORIZONTAL);
+inline TrackingWheel verticalTrackingWheel(12, 2.08, -.5, WheelPosition::VERTICAL);
 
 // Odometry
 inline OdomSensors odometry(&verticalTrackingWheel,&horizontalTrackingWheel , &imu);
 inline PIDController lateral(8,0,0);
 inline PIDController turn(60,0.2,3);
-inline PIDController align(30,0,0);
+inline PIDController align(60,0,0);
 // Chassis
 inline TankChassis chassis(&drivetrain, &odometry,&lateral,&turn,&align);
 
