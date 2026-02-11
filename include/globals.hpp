@@ -33,8 +33,8 @@ inline pros::IMU imu(14);
 
 inline OdomSensors odometry(&verticalTrackingWheel, &horizontalTrackingWheel, &imu);
 
-inline PIDController Lateral(6,0,.1);
-inline PIDController Turn(60,0.2,0);
-inline PIDController Align(30,0,0);
+inline PIDController Lateral(6,0.0001,.1);
+inline PIDController Turn(55,0.075,0);
+inline PIDController Align(45,0,0);
 
 inline TankChassis chassis(&drivetrain, &odometry ,&Lateral, &Turn, &Align);

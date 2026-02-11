@@ -71,6 +71,7 @@ void TankChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) 
     movePID->setSmallErrorRange(.5);
     movePID->setLargeErrorRange(1.25);
     movePID->setSlewRate(200);
+    movePID->setIZone(18);
 
     Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; });
     Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
