@@ -44,11 +44,11 @@ void intakePeriodic()
 
     }
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
-        deScore.extend();
+        deScore.retract();
     }
 
     if(controller.get_digital_new_release(pros::E_CONTROLLER_DIGITAL_B)){
-        deScore.retract();
+        deScore.extend();
     }
 
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){

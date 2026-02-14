@@ -1,5 +1,15 @@
 #include "main.h"
 
+void wiggle(int speed){
+	for(int i=0; i<20; i++)
+	leftMotors.move(speed+5);
+	rightMotors.move(-speed);
+	pros::delay(100);	
+	leftMotors.move(-speed);
+	rightMotors.move(speed+5);
+	pros::delay(100);
+}
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -82,15 +92,6 @@ void autonomous() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void wiggle(int speed){
-	for(int i=0; i<20; i++)
-	leftMotors.move(speed+5);
-	rightMotors.move(-speed);
-	pros::delay(100);	
-	leftMotors.move(-speed);
-	rightMotors.move(speed+5);
-	pros::delay(100);
-}
  
 void opcontrol()
 {
