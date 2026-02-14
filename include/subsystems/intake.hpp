@@ -5,8 +5,15 @@
 // Initializes the intake system motors, setting brake mode
 void intakeInitialize();
 
-// Polls the controller and determines motor state
+// Polls the controller and determines intake motor state and match load piston state
 void intakePeriodic();
+
+// Polls the controller and determines lever motor, lift pistion, and wing piston states
+void leverPeriodic();
+
+void leverRetract();
+void leverScoreHigh(bool liftState);
+void leverScoreMid(int speed);
 
 // Sets the speed of the intake motor to the specified parameter
 void setIntakeSpeed(int speed);

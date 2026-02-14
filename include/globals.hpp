@@ -24,6 +24,7 @@ inline pros::Motor leverMotor(-15);
 
 inline pros::adi::Pneumatics liftPiston('F', false);
 inline pros::adi::Pneumatics matchLoadPiston('G', false);
+inline pros::adi::Pneumatics wingPiston('H', false);
 
 // Odometry Pieces
 inline TrackingWheel verticalTrackingWheel(-16, 2.08, -3.5, WheelPosition::VERTICAL);

@@ -1,23 +1,5 @@
 #include "main.h"
-void wiggle(int speed){
-	for(int i = 0; i < 17; i++ ){
-		leftDrive.move(speed+5);
-		rightDrive.move(-speed);
-		pros::delay(100);
-		leftDrive.move(-speed);
-		rightDrive.move(speed+5);
-		pros::delay(100);
-	}
 
-}
-void pulseIntake(int fDelay, int bDelay,int intakeSpeed,int outtakeSpeed, int cycle){
-	for(int i = 0; i < cycle; i++){
-		moveBallPath(intakeSpeed,intakeSpeed,intakeSpeed,intakeSpeed);
-		pros::delay(fDelay);
-		moveBallPath(outtakeSpeed,outtakeSpeed,outtakeSpeed,outtakeSpeed);
-		pros::delay(bDelay);
-	}
-}
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -60,8 +42,6 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.startTracking();
-	chassis.turnToAngle(90, 5000);
-	controller.set_text(0, 0, std::to_string(chassis.getPose().getTheta()));
 }
 
 /**
@@ -88,10 +68,11 @@ void opcontrol() {
 		chassis.arcade(leftY, rightX);
 
 		intakePeriodic();
+		leverPeriodic();
 
-		 if(controller.get_digital_new_press(DIGITAL_A)){
-		 	autonomous();
-		 }
+		//  if(controller.get_digital_new_press(DIGITAL_A)){
+		//  	autonomous();
+		//  }
 
 		pros::delay(20);
 	}
