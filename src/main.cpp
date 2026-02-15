@@ -61,7 +61,7 @@ void autonomous() {
 	MatchLoader.extend();
 	hood.extend();
 	bottomIntakeMotors.move(-127);
-	chassis.moveDistance(20,1500);	
+	chassis.moveDistance(20,1500);
 	wiggle(40);
 	wiggle(40);
 	wiggle(40);
