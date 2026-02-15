@@ -79,6 +79,7 @@ void opcontrol(void);
 #include "lib/api.hpp"
 #include "globals.hpp"
 #include "subsystems/intake.hpp"
+#include "subsystems/autos.hpp"
 #include "screen.h"
 
 #endif

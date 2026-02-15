@@ -19,7 +19,7 @@ bool isScoring = false;
 
 void leverRetract() {
     isScoring = false;
-    leverMotor.move(-75);
+    leverMotor.move(-100);
     pros::delay(100);
     leverMotor.move(0);
     
@@ -27,7 +27,7 @@ void leverRetract() {
 
 bool liftUp = false;
 void leverScoreHigh(bool liftState) {
-    if(liftUp){
+    if(liftState){
         isScoring = true;
         setIntakeSpeed(100);
         pros::delay(100);

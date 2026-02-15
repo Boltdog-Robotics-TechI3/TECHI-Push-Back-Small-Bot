@@ -42,6 +42,8 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.startTracking();
+	threeMidNineHigh();
+	controller.set_text(0,0, chassis.getPose().to_string());
 }
 
 /**
@@ -69,6 +71,10 @@ void opcontrol() {
 
 		intakePeriodic();
 		leverPeriodic();
+
+		if(controller.get_digital_new_press(DIGITAL_RIGHT)){
+			autonomous();
+		}
 
 		//  if(controller.get_digital_new_press(DIGITAL_A)){
 		//  	autonomous();

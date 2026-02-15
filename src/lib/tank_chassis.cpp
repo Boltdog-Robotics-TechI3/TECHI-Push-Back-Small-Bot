@@ -69,7 +69,7 @@ void TankChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) 
 
     movePID->setOutputLimits(-maxSpeed, maxSpeed);
     movePID->setSmallErrorRange(.5);
-    movePID->setLargeErrorRange(1.25);
+    movePID->setLargeErrorRange(1.75);
     movePID->setSlewRate(200);
     movePID->setIZone(18);
 
@@ -203,9 +203,9 @@ void TankChassis::turnToAngle(double targetAngle, int timeout) {
     Timer largeErrorTimer(1500, +[]() { Chassis::isAtSetpoint = true; });
 
     turnPID->reset();
-    turnPID->setOutputLimits(-45, 45);
-    turnPID->setSmallErrorRange(0.02);
-    turnPID->setLargeErrorRange(0.08);
+    turnPID->setOutputLimits(-80, 80);
+    turnPID->setSmallErrorRange(0.01);
+    turnPID->setLargeErrorRange(0.05);
     turnPID->setIZone(.5);
 
     timeoutTimer.start();

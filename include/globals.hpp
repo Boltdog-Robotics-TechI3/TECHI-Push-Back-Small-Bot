@@ -28,14 +28,14 @@ inline pros::adi::Pneumatics wingPiston('H', false);
 
 // Odometry Pieces
 inline TrackingWheel verticalTrackingWheel(-16, 2.08, -3.5, WheelPosition::VERTICAL);
-inline TrackingWheel horizontalTrackingWheel(-17, 2.08, -4.75, WheelPosition::HORIZONTAL);
+inline TrackingWheel horizontalTrackingWheel(-17, 2.08, -5.5, WheelPosition::HORIZONTAL);
 
 inline pros::IMU imu(14);
 
 inline OdomSensors odometry(&verticalTrackingWheel, &horizontalTrackingWheel, &imu);
 
-inline PIDController Lateral(6,0.0001,.1);
-inline PIDController Turn(55,0.075,0);
-inline PIDController Align(45,0,0);
+inline PIDController Lateral(3.75, 0.001, 0);
+inline PIDController Turn(80, 0.2, 0);
+inline PIDController Align(80, 0, 0);
 
 inline TankChassis chassis(&drivetrain, &odometry ,&Lateral, &Turn, &Align);
