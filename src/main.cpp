@@ -42,7 +42,7 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.startTracking();
-	threeMidNineHigh();
+	fourHigh();
 	controller.set_text(0,0, chassis.getPose().to_string());
 }
 
@@ -66,15 +66,19 @@ void opcontrol() {
 
 	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
-		rightX = controller.get_analog(ANALOG_RIGHT_X);
-		chassis.arcade(leftY, rightX);
+		rightX = controller.get_analog(ANALOG_RIGHT_X) * (2.0/3.0);
+		// if(intakeForward) {
+		    // chassis.arcade(leftY, rightX);
+	    // } else {
+		chassis.arcade(-leftY, rightX);
+		// }
 
 		intakePeriodic();
 		leverPeriodic();
 
-		if(controller.get_digital_new_press(DIGITAL_RIGHT)){
-			autonomous();
-		}
+		// if(controller.get_digital_new_press(DIGITAL_RIGHT)){
+		// 	autonomous();
+		// }
 
 		//  if(controller.get_digital_new_press(DIGITAL_A)){
 		//  	autonomous();

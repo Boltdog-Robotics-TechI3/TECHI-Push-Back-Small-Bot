@@ -7,6 +7,9 @@ inline bool redAlliance = false;
 inline bool blueAlliance = true;
 inline int autoSelection = 0;
 
+inline bool intakeForward = false;
+
+
 inline const double wheelDiameter = 2.75;
 inline const double trackWidth = 12.5;
 inline const double gearRatio = 36.0 / 48.0;

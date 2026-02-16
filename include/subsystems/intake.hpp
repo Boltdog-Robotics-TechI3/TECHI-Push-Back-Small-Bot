@@ -2,6 +2,7 @@
 
 #include "main.h"
 
+
 // Initializes the intake system motors, setting brake mode
 void intakeInitialize();
 
@@ -13,7 +14,7 @@ void leverPeriodic();
 
 void leverRetract();
 void leverScoreHigh(bool liftState);
-void leverScoreMid(int speed);
+void leverScoreMid(int speed, bool liftState);
 
 // Sets the speed of the intake motor to the specified parameter
 void setIntakeSpeed(int speed);
