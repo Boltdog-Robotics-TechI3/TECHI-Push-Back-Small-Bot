@@ -1,10 +1,11 @@
 #include "main.h"
+// minimum is 0, max is 70
+
+std::atomic<bool> isLeverSettled = false;
 
 void intakeInitialize() {
     intakeMotor.set_brake_mode(MOTOR_BRAKE_COAST);
     leverMotor.set_brake_mode(MOTOR_BRAKE_COAST);
-    leverMotor.set_gearing(pros::E_MOTOR_GEAR_RED);
-
 }
 
 void setIntakeSpeed(int speed) {
@@ -15,113 +16,64 @@ void setLeverSpeed(int speed) {
     leverMotor.move(speed);
 }
 
-bool isScoring = false;
+void setLeverPosition(int position, int maxVel, int maxAccel) {
+    isLeverSettled = false;
 
-void leverRetract() {
-    isScoring = false;
-    leverMotor.move(-127);
-    pros::delay(150);
-    leverMotor.move(-15);
+    Timer timeoutTimer(2000, +[]() { isLeverSettled = true; });
+    Timer largeErrorTimer(500, +[]() { isLeverSettled = true; });
     
-}
+    int output;
+    int startTime = pros::millis();
 
-bool liftUp = false;
-void leverScoreHigh(bool liftState) {
-    if(liftState){
-        isScoring = true;
-        setIntakeSpeed(100);
-        pros::delay(100);
-        leverMotor.move_relative(650, 450);
-    }
-}
+    leverPID.reset();
 
-void leverScoreMid(int speed, bool liftState) {
-    if(!liftState){
-        isScoring = true;
-        setIntakeSpeed(100);
-        pros::delay(100);
-        leverMotor.move_relative(650, speed);
+    leverPID.setOutputLimits(-maxVel, maxVel);
+    leverPID.setLargeErrorRange(50);
+    leverPID.setSlewRate(maxAccel);
+    
+    timeoutTimer.start();
+
+    while (!isLeverSettled) {
+        output = leverPID.calculate(leverMotor.get_position(), position);
+
+        setLeverSpeed(output);
+
+        if (leverMotor.get_actual_velocity() <= 15 && 200 < (pros::millis() - startTime)){
+            isLeverSettled = true;
+        }
+
+        if (leverPID.isInLargeErrorRange()) {
+            largeErrorTimer.start();
+        }
+        else {
+            largeErrorTimer.stop();
+        }
+
+        pros::delay(20);
     }
+
+    largeErrorTimer.stop();
+    timeoutTimer.stop();
+    setLeverSpeed(0);
 }
 
 
 void intakePeriodic() {
-//INTAKE CONTROLS
-    if(!isScoring) {
-        if (controller.get_digital(DIGITAL_L1)) { // Intaking
-            setIntakeSpeed(127);
-            intakeForward = true;
-        } else if (controller.get_digital(DIGITAL_A)) { // Eject blocks
-            setIntakeSpeed(-100);
-        }  else { // Idle
-            setIntakeSpeed(30);
-            intakeForward = false;
-        }
 
-        // MATCH LOAD PISTON
-        if (controller.get_digital_new_press(DIGITAL_LEFT)) {
-            matchLoadPiston.toggle();
-        } 
-    }
 }
 
 void leverPeriodic() {
-//SCORING CONTROLS
-    if (controller.get_digital_new_press(DIGITAL_R2)) { // Lever Score
-        leverScoreHigh(liftUp);
-    } if (controller.get_digital_new_release(DIGITAL_R2)) { // Lever DOWN
-        if(liftUp){
-            leverRetract(); 
-        } else {
-            liftPiston.extend();
-            liftUp = true;
-        } 
-    }
-    if (controller.get_digital_new_press(DIGITAL_R1)) { // Lever Score
-        leverScoreMid(600, liftUp);
-    } if (controller.get_digital_new_release(DIGITAL_R1)) { // Lever DOWN
-         if(!liftUp){
-            leverRetract(); 
-        } else {
-            liftPiston.retract();
-            liftUp = false;
-        }  
-    }
-    if (controller.get_digital_new_press(DIGITAL_Y)) { // Lever Score
-        leverScoreMid(200, false);
-    } if (controller.get_digital_new_release(DIGITAL_Y)) { // Lever DOWN
-
-            leverRetract(); 
+    if (controller.get_digital_new_press(DIGITAL_X)) {
+        setLeverPosition(130, 127, 200);
     } 
-    
-//LEVER MANUAL OVERRIDE
-    if (controller.get_digital(DIGITAL_X)) {
-        setLeverSpeed(75);
-    } else if (controller.get_digital(DIGITAL_B)) {
+    else if (controller.get_digital(DIGITAL_B)) {
         setLeverSpeed(-75);
     } 
-    if (controller.get_digital_new_release(DIGITAL_X) || controller.get_digital_new_release(DIGITAL_B)) {
-        setLeverSpeed(-15);
+    if (!controller.get_digital_new_press(DIGITAL_X) && !controller.get_digital_new_press(DIGITAL_B)) {
+        // setLeverSpeed(-15);
     }
     
-//PNEUMATIC CONTROLS
-    //LIFT PISTON
-    if (controller.get_digital_new_press(DIGITAL_UP)) {
-        liftPiston.extend();
-        liftUp = true;
+    if (leverMotor.get_position() <= 20){
+        setLeverSpeed(0);
     }
-    if (controller.get_digital_new_press(DIGITAL_DOWN)) {
-        liftPiston.retract();
-        wingPiston.retract();
-        liftUp = false;
-    }
-     
-    // WING PISTON
-    if (controller.get_digital_new_press(DIGITAL_L2)) {
-        wingPiston.extend();
-    }
-    if (controller.get_digital_new_release(DIGITAL_L2)) {
-        wingPiston.retract();
-    }
-
 }

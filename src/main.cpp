@@ -9,6 +9,8 @@
 void initialize() {
 	chassis.reset();
 	chassis.setInputScale(Chassis::InputScale::SINSQUARED);
+
+	intakeInitialize();
 }
 
 /**
@@ -75,6 +77,8 @@ void opcontrol() {
 
 		intakePeriodic();
 		leverPeriodic();
+
+		controller.set_text(0, 0, std::to_string(leverMotor.get_position()));
 
 		// if(controller.get_digital_new_press(DIGITAL_RIGHT)){
 		// 	autonomous();

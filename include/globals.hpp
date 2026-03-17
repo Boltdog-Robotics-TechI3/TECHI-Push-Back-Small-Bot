@@ -23,7 +23,9 @@ inline TankDrivetrain drivetrain(&leftDrive, &rightDrive, wheelDiameter, trackWi
 
 // Intake Pieces
 inline pros::Motor intakeMotor(-1);
-inline pros::Motor leverMotor(-15);
+inline pros::Motor leverMotor(-15, pros::v5::MotorGears::red, pros::v5::MotorUnits::degrees);
+
+inline PIDController leverPID(300, 0, 0);
 
 inline pros::adi::Pneumatics liftPiston('F', false);
 inline pros::adi::Pneumatics matchLoadPiston('G', false);
@@ -37,8 +39,8 @@ inline pros::IMU imu(14);
 
 inline OdomSensors odometry(&verticalTrackingWheel, &horizontalTrackingWheel, &imu);
 
-inline PIDController Lateral(3.75, 0.001, 0);
-inline PIDController Turn(80, 0.2, 0);
-inline PIDController Align(80, 0, 0);
+inline PIDController lateral(3.75, 0.001, 0);
+inline PIDController turn(80, 0.2, 0);
+inline PIDController align(80, 0, 0);
 
-inline TankChassis chassis(&drivetrain, &odometry ,&Lateral, &Turn, &Align);
+inline TankChassis chassis(&drivetrain, &odometry ,&lateral, &turn, &align);
