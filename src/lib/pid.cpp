@@ -200,6 +200,7 @@ void PIDController::reset() {
     accumulatedError = 0.0;
     error = 0.0;
     previousError = 0.0;
+    previousOutput = 0.0;
     previousTime = pros::millis();
     currentTime = pros::millis();
 }

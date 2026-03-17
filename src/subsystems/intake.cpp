@@ -38,7 +38,7 @@ void setLeverPosition(int position, int maxVel, int maxAccel) {
 
         setLeverSpeed(output);
 
-        if (leverMotor.get_actual_velocity() <= 15 && 200 < (pros::millis() - startTime)){
+        if (leverMotor.get_actual_velocity() <= 5 && 1500 < (pros::millis() - startTime)){
             isLeverSettled = true;
         }
 
@@ -59,21 +59,25 @@ void setLeverPosition(int position, int maxVel, int maxAccel) {
 
 
 void intakePeriodic() {
-
+    setIntakeSpeed(20);
 }
 
 void leverPeriodic() {
-    if (controller.get_digital_new_press(DIGITAL_X)) {
-        setLeverPosition(130, 127, 200);
+    
+    if (controller.get_digital_new_press(DIGITAL_R2)) {
+        setLeverPosition(200, 127, 400);
     } 
+    else if (controller.get_digital_new_press(DIGITAL_R1)){
+        setLeverPosition(120,50,400);
+    }
     else if (controller.get_digital(DIGITAL_B)) {
         setLeverSpeed(-75);
     } 
-    if (!controller.get_digital_new_press(DIGITAL_X) && !controller.get_digital_new_press(DIGITAL_B)) {
-        // setLeverSpeed(-15);
+    if (!controller.get_digital_new_press(DIGITAL_R2) && !controller.get_digital_new_press(DIGITAL_B) && !controller.get_digital_new_press(DIGITAL_R1)){
+        setLeverSpeed(-15);
     }
     
-    if (leverMotor.get_position() <= 20){
+    if (leverMotor.get_position() <= 10){
         setLeverSpeed(0);
     }
 }
