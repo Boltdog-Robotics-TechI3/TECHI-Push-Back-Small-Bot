@@ -59,7 +59,15 @@ void setLeverPosition(int position, int maxVel, int maxAccel) {
 
 
 void intakePeriodic() {
-    setIntakeSpeed(20);
+    if (controller.get_digital(DIGITAL_L1)) {
+        setIntakeSpeed(127);
+    }
+    else if (controller.get_digital(DIGITAL_L2)) {
+        setIntakeSpeed(-127);
+    }
+    else {
+        setIntakeSpeed(30);
+    }
 }
 
 void leverPeriodic() {
