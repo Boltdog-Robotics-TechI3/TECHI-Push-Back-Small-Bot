@@ -24,7 +24,7 @@ void threeMidNineHigh() {
 }
 
 void doNothing(){
-    wingPiston.extend();
+    // wingPiston.extend();
 }
 
 void fourHigh(){

@@ -60,6 +60,7 @@ void setLeverPosition(int position, int maxVel, int maxAccel) {
 
 void intakePeriodic() {
     if (controller.get_digital(DIGITAL_L1)) {
+        hoodPiston.retract();
         setIntakeSpeed(127);
     }
     else if (controller.get_digital(DIGITAL_L2)) {
@@ -71,11 +72,20 @@ void intakePeriodic() {
 }
 
 void leverPeriodic() {
-    
+    if (controller.get_digital_new_press(DIGITAL_UP)) {
+        liftPiston.extend();
+    }
+    else if (controller.get_digital_new_press(DIGITAL_DOWN)) {
+        liftPiston.retract();
+    }
+
+
     if (controller.get_digital_new_press(DIGITAL_R2)) {
+        hoodPiston.extend();
         setLeverPosition(200, 127, 400);
     } 
     else if (controller.get_digital_new_press(DIGITAL_R1)){
+        hoodPiston.extend();
         setLeverPosition(120,50,400);
     }
     else if (controller.get_digital(DIGITAL_B)) {
@@ -84,7 +94,6 @@ void leverPeriodic() {
     if (!controller.get_digital_new_press(DIGITAL_R2) && !controller.get_digital_new_press(DIGITAL_B) && !controller.get_digital_new_press(DIGITAL_R1)){
         setLeverSpeed(-15);
     }
-    
     if (leverMotor.get_position() <= 10){
         setLeverSpeed(0);
     }
