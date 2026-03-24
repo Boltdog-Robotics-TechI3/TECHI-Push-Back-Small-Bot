@@ -63,7 +63,7 @@ void intakePeriodic() {
         hoodPiston.retract();
         setIntakeSpeed(127);
     }
-    else if (controller.get_digital(DIGITAL_L2)) {
+    else if (controller.get_digital(DIGITAL_A)) {
         setIntakeSpeed(-127);
     }
     else {
@@ -94,7 +94,12 @@ void leverPeriodic() {
     if (!controller.get_digital_new_press(DIGITAL_R2) && !controller.get_digital_new_press(DIGITAL_B) && !controller.get_digital_new_press(DIGITAL_R1)){
         setLeverSpeed(-15);
     }
-    if (leverMotor.get_position() <= 10){
+    if (leverMotor.get_position() <= 0){
         setLeverSpeed(0);
     }
+    if (controller.get_digital_new_press(DIGITAL_L2)) {
+        hoodPiston.extend();
+    } else if (controller.get_digital_new_release(DIGITAL_L2)) {
+        hoodPiston.retract();
+}
 }
