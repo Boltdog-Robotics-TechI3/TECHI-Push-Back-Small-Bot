@@ -43,11 +43,11 @@ void intakePeriodic()
         //odomRetract.toggle();
 
     }
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
         deScore.retract();
     }
 
-    if(controller.get_digital_new_release(pros::E_CONTROLLER_DIGITAL_B)){
+    if(controller.get_digital_new_release(pros::E_CONTROLLER_DIGITAL_A)){
         deScore.extend();
     }
 
