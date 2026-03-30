@@ -2,11 +2,17 @@
 
 #include "main.h"
 
-// Initializes the intake system motors, setting brake mode
-void intakeInitialize();
+enum LeverState {
+    IDLE,
+    INTAKING,
+    OUTTAKING,
+    SCORING
+};
 
-// Polls the controller and determines intake motor state and match load piston state
-void intakePeriodic();
+// Initializes the intake system motors, setting brake mode
+void leverInitialize();
+
+void setLeverState(LeverState state);
 
 // Polls the controller and determines lever motor, lift pistion, and wing piston states
 void leverPeriodic();
@@ -17,5 +23,6 @@ void setIntakeSpeed(int speed);
 // Sets the speed of the lift motor to the specified parameter
 void setLeverSpeed(int speed);
 
-// Set the postion maxVel,and maxAccel 
-void setLeverState(float post, float vel, float accel);
+// Sets the 
+void setLeverPosition(float targetPosition, float maxVel, float maxAccel);
+

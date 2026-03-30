@@ -10,7 +10,7 @@ void initialize() {
 	chassis.reset();
 	chassis.setInputScale(Chassis::InputScale::SINSQUARED);
 
-	intakeInitialize();
+	leverInitialize();
 }
 
 /**
@@ -69,16 +69,12 @@ void opcontrol() {
 	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
 		rightX = controller.get_analog(ANALOG_RIGHT_X) * (2.0/3.0);
-		// if(intakeForward) {
-		    // chassis.arcade(leftY, rightX);
-	    // } else {
-		chassis.arcade(-leftY, rightX);
-		// }
+		
+		chassis.arcade(leftY, rightX);
 
-		intakePeriodic();
 		leverPeriodic();
 
-		controller.set_text(0, 0, std::to_string(leverMotor.get_position()));
+		// controller.set_text(0, 0, std::to_string(leverMotor.get_position()));
 
 		// if(controller.get_digital_new_press(DIGITAL_RIGHT)){
 		// 	autonomous();

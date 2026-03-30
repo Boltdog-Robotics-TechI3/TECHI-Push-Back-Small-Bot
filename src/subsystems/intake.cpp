@@ -1,65 +1,43 @@
 #include "main.h"
-// minimum is 0, max is 70
+
+LeverState leverState = LeverState::IDLE;
 
 std::atomic<bool> isLeverSettled = false;
 
-float targetPosition = 0;
-float maxVel = 0;
-float maxAccel = 0;
+int maxSpeed = 127;
 
 pros::Task leverTask = pros::Task([]() {
     while(1) {
-        isLeverSettled = false;
-
-        Timer timeoutTimer(2000, +[]() { isLeverSettled = true; });
-        Timer largeErrorTimer(500, +[]() { isLeverSettled = true; });
-        
-        int output;
-        int startTime = pros::millis();
-
-        leverPID.reset();
-
-        leverPID.setOutputLimits(-maxVel, maxVel);
-        leverPID.setLargeErrorRange(50);
-        leverPID.setSlewRate(maxAccel);
-        
-        timeoutTimer.start();
-
-        while (!isLeverSettled) {
-            if (leverTask.notify_clear()) {
-                isLeverSettled = true;
+        switch (leverState) {
+            case IDLE:
+                setIntakeSpeed(20);
                 break;
-            }
-            
-            output = leverPID.calculate(leverMotor.get_position(), targetPosition);
-
-            setLeverSpeed(output);
-
-            if (leverMotor.get_actual_velocity() <= 5 && 1500 < (pros::millis() - startTime)){
-                isLeverSettled = true;
-            }
-
-            if (leverPID.isInLargeErrorRange()) {
-                largeErrorTimer.start();
-            }
-            else {
-                largeErrorTimer.stop();
-            }
-
-            pros::delay(20);
+            case INTAKING:
+                setIntakeSpeed(127);
+                break;
+            case OUTTAKING:
+                setIntakeSpeed(-80);
+                break;
+            case SCORING:
+                setIntakeSpeed(127);
+                setLeverPosition(200, maxSpeed, 400);
+                setIntakeSpeed(-30);
+                setLeverPosition(0, 50, 100);
+                setLeverState(LeverState::IDLE);
+                break;
         }
 
-        largeErrorTimer.stop();
-        timeoutTimer.stop();
-        setLeverSpeed(0);
-        
         pros::delay(20);
     }
 });
 
-void intakeInitialize() {
+void leverInitialize() {
     intakeMotor.set_brake_mode(MOTOR_BRAKE_COAST);
     leverMotor.set_brake_mode(MOTOR_BRAKE_COAST);
+}
+
+void setLeverState(LeverState state) {
+    leverState = state;
 }
 
 void setIntakeSpeed(int speed) {
@@ -70,21 +48,46 @@ void setLeverSpeed(int speed) {
     leverMotor.move(speed);
 }
 
-void intakePeriodic() {
-    if (controller.get_digital(DIGITAL_L1)) {
-        hoodPiston.retract();
-        setIntakeSpeed(127);
-    }
-    else if (controller.get_digital(DIGITAL_A)) {
-        setIntakeSpeed(-127);
-    }
-    else {
-        setIntakeSpeed(30);
-    }
-    
-}
-
 void leverPeriodic() {
+    if (controller.get_digital(DIGITAL_L1) && leverState != LeverState::SCORING) {
+        hoodPiston.retract();
+        setLeverState(LeverState::INTAKING);
+    }
+    else if (controller.get_digital(DIGITAL_A) && leverState != LeverState::SCORING) {
+        hoodPiston.retract();
+        setLeverState(LeverState::OUTTAKING);
+    }    
+    else if (controller.get_digital_new_press(DIGITAL_R2)) {
+        if (hoodPiston.is_extended()) {
+            maxSpeed = 127;
+            setLeverState(LeverState::SCORING);
+        }
+        else {
+            hoodPiston.extend();
+        }
+    } 
+    else if (controller.get_digital_new_press(DIGITAL_R1)) {
+        if (hoodPiston.is_extended()) {
+            maxSpeed = 90;
+            setLeverState(LeverState::SCORING);
+        }
+        else {
+            hoodPiston.extend();
+        }
+    } 
+    else if (controller.get_digital_new_press(DIGITAL_X)){
+        if (hoodPiston.is_extended()) {
+            maxSpeed = 50;
+            setLeverState(LeverState::SCORING);
+        }
+        else {
+            hoodPiston.extend();
+        }
+    }
+    else if (leverState != LeverState::SCORING) {
+        setLeverState(LeverState::IDLE);
+    }
+
     if (controller.get_digital_new_press(DIGITAL_UP)) {
         liftPiston.extend();
     }
@@ -92,44 +95,54 @@ void leverPeriodic() {
         liftPiston.retract();
     }
 
-    if (controller.get_digital_new_press(DIGITAL_R2)) {
-        hoodPiston.extend();
-        setIntakeSpeed(127);
-
-        setLeverState(200, 127, 400);
-    } 
-    else if (controller.get_digital_new_press(DIGITAL_R1)){
-        hoodPiston.extend();
-        setIntakeSpeed(127);
-
-        setLeverState(120,50, 400);
-    }
-    else if (isLeverSettled && targetPosition) {
-        setLeverState(0, 50, 100);
-    }
-
-    // else if (controller.get_digital(DIGITAL_B)) {
-    //     setLeverSpeed(-75);
-    // } 
-    // if (!controller.get_digital_new_press(DIGITAL_R2) && !controller.get_digital_new_press(DIGITAL_B) && !controller.get_digital_new_press(DIGITAL_R1)){
-    //     setLeverSpeed(-15);
-    // }
-    // if (leverMotor.get_position() <= 0){
-    //     setLeverSpeed(0);
-    // }
-
     if (controller.get_digital_new_press(DIGITAL_L2)) {
-        hoodPiston.extend();
-    } 
-    else if (controller.get_digital_new_release(DIGITAL_L2)) 
         hoodPiston.retract();
+    } 
+    else if (controller.get_digital_new_release(DIGITAL_L2))  {
+        hoodPiston.extend();
+    }
 }
 
-void setLeverState(float post, float vel, float accel){
-    leverTask.suspend();
-    targetPosition = post;
-    maxVel = vel;
-    maxAccel = accel;
-    leverTask.notify();
-    leverTask.resume();
+void leverClosedLoop(float targetPosition, float maxVel, float maxAccel) {
+    int output = leverPID.calculate(leverMotor.get_position(), targetPosition);
+    setLeverSpeed(output);
+}
+
+void setLeverPosition(float targetPosition, float maxVel, float maxAccel) {
+    isLeverSettled = false;
+
+    Timer timeoutTimer(2000, +[]() { isLeverSettled = true; });
+    Timer largeErrorTimer(500, +[]() { isLeverSettled = true; });
+    
+    int output;
+    int startTime = pros::millis();
+
+    leverPID.reset();
+
+    leverPID.setOutputLimits(-maxVel, maxVel);
+    leverPID.setLargeErrorRange(50);
+    leverPID.setSlewRate(maxAccel);
+    
+    timeoutTimer.start();
+
+    while (!isLeverSettled) {        
+        leverClosedLoop(targetPosition, maxVel, maxAccel);
+
+        if (leverMotor.get_actual_velocity() <= 5 && 1500 < (pros::millis() - startTime)){
+            isLeverSettled = true;
+        }
+
+        if (leverPID.isInLargeErrorRange()) {
+            largeErrorTimer.start();
+        }
+        else {
+            largeErrorTimer.stop();
+        }
+
+        pros::delay(20);
+    }
+
+    largeErrorTimer.stop();
+    timeoutTimer.stop();
+    setLeverSpeed(0);
 }

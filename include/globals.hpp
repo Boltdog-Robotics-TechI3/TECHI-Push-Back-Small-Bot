@@ -16,8 +16,8 @@ inline const double gearRatio = 36.0 / 48.0;
 
 // Drivetrain Pieces
 inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
-inline pros::MotorGroup leftDrive({-11, -12, 13});
-inline pros::MotorGroup rightDrive({-18, 19, 20});
+inline pros::MotorGroup leftDrive({3, -20, -19, 18});
+inline pros::MotorGroup rightDrive({-4, 11, 12, -13});
 
 inline TankDrivetrain drivetrain(&leftDrive, &rightDrive, wheelDiameter, trackWidth, gearRatio);
 
@@ -28,7 +28,7 @@ inline pros::Motor leverMotor(-15, pros::v5::MotorGears::red, pros::v5::MotorUni
 inline PIDController leverPID(300, 0, 0);
 
 inline pros::adi::Pneumatics liftPiston('F', false);
-inline pros::adi::Pneumatics matchLoadPiston('G', false);
+// inline pros::adi::Pneumatics matchLoadPiston('G', false);
 inline pros::adi::Pneumatics hoodPiston('H', false);
 
 // Odometry Pieces
