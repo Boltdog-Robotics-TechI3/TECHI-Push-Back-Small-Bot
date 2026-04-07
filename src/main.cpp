@@ -43,12 +43,18 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+	chassis.setPose(14, 48, M_PI);
 	chassis.startTracking();
-	chassis.setPose(0, 0, M_PI);
+	chassis.setPose(14, 48, M_PI);
 	setLeverState(LeverState::INTAKING);
-	chassis.moveToPose({32, 40, 0}, 5000, 100);
+	chassis.moveToPose({45, 9, 0}, 5000000, 50);
 	setLeverState(LeverState::IDLE);
-	chassis.moveToPose({20, 20, 0}, 5000, 100);
+	chassis.moveToPose({14, 14, 0}, 5000, 100);
+	//setLeverState(LeverState::OUTTAKING);
+	setLeverState(LeverState::INTAKING);
+	chassis.moveToPose({45, 59, 0}, 5000, 100);
+	chassis.moveToPose({46, 30, 0}, 5000, 100);
+	setLeverState(LeverState::OUTTAKING);
 	controller.set_text(0,0, chassis.getPose().to_string());
 }
 
@@ -68,7 +74,7 @@ void autonomous() {
 void opcontrol() {
 	int leftY, rightX;
 
-	chassis.setPose(0, 0, M_PI);
+	chassis.setPose(14, 48, M_PI);
 	chassis.startTracking();
 
 	while (true) {
