@@ -32,8 +32,8 @@ inline pros::adi::Pneumatics liftPiston('F', false);
 inline pros::adi::Pneumatics hoodPiston('H', false);
 
 // Odometry Pieces
-inline TrackingWheel verticalTrackingWheel(-16, 2.08, -3.5, WheelPosition::VERTICAL);
-inline TrackingWheel horizontalTrackingWheel(-17, 2.08, -5.5, WheelPosition::HORIZONTAL);
+inline TrackingWheel verticalTrackingWheel(16, 2.08, 3.5, WheelPosition::VERTICAL);
+inline TrackingWheel horizontalTrackingWheel(17, 2.08, 5.5, WheelPosition::HORIZONTAL);
 
 inline pros::IMU imu(14);
 

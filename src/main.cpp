@@ -44,7 +44,11 @@ void competition_initialize() {}
  */
 void autonomous() {
 	chassis.startTracking();
-	fourHigh();
+	chassis.setPose(0, 0, M_PI);
+	setLeverState(LeverState::INTAKING);
+	chassis.moveToPose({32, 40, 0}, 5000, 100);
+	setLeverState(LeverState::IDLE);
+	chassis.moveToPose({20, 20, 0}, 5000, 100);
 	controller.set_text(0,0, chassis.getPose().to_string());
 }
 
@@ -64,7 +68,8 @@ void autonomous() {
 void opcontrol() {
 	int leftY, rightX;
 
-	// controller.clear();
+	chassis.setPose(0, 0, M_PI);
+	chassis.startTracking();
 
 	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
@@ -75,10 +80,11 @@ void opcontrol() {
 		leverPeriodic();
 
 		// controller.set_text(0, 0, std::to_string(leverMotor.get_position()));
+		controller.set_text(0, 0, chassis.getPose().to_string());
 
-		// if(controller.get_digital_new_press(DIGITAL_RIGHT)){
-		// 	autonomous();
-		// }
+		if(controller.get_digital_new_press(DIGITAL_RIGHT)){
+			autonomous();
+		}
 
 		//  if(controller.get_digital_new_press(DIGITAL_A)){
 		//  	autonomous();
