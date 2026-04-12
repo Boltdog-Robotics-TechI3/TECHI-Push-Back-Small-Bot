@@ -46,14 +46,29 @@ void autonomous() {
 	chassis.startTracking();
 	chassis.setPose(14, 48, 0);
 	setLeverState(LeverState::INTAKING);
-	chassis.moveToPose({45, 9, 0}, 5000000, 50);
+	chassis.moveToPose({45, 7, 0}, 5000000, 50);
 	setLeverState(LeverState::IDLE);
-	chassis.moveToPose({14, 14, 0}, 5000, 100);
+	chassis.moveToPose({13, 13, 0}, 5000, 100);
+	chassis.turnToAngle(135,5000);
 	//setLeverState(LeverState::OUTTAKING);
 	setLeverState(LeverState::INTAKING);
-	chassis.moveToPose({45, 59, 0}, 5000, 100);
-	chassis.moveToPose({46, 30, 0}, 5000, 100);
-	setLeverState(LeverState::OUTTAKING);
+	chassis.moveToPose({49, 48, 0}, 5000, 100);
+	chassis.turnToAngle(180,5000);
+	matchLoadPiston.extend();
+	liftPiston.extend();
+	chassis.moveToPose({48.5, 58, 0}, 2000, 100);
+	chassis.moveToPose({48.5, 55, 0}, 2000, 100);
+	chassis.moveToPose({48.5, 58, 0}, 2000, 100);
+	chassis.moveToPose({48.5, 32, 0}, 2000, 100);
+	matchLoadPiston.retract();
+	hoodPiston.extend();
+	setLeverPosition(100,100,100);
+	setLeverPosition(0,100,100);
+	chassis.setPose(48.5, 32, 0);
+	chassis.moveToPose({48.5, 48, 0}, 5000, 100);
+	chassis.turnToAngle(30,5000);
+	setLeverPosition(100,100,100);
+	setLeverPosition(0,100,100);
 	controller.set_text(0,0, chassis.getPose().to_string());
 }
 
@@ -78,7 +93,7 @@ void opcontrol() {
 
 	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);
-		rightX = controller.get_analog(ANALOG_RIGHT_X) * (2.0/3.0);
+		rightX = controller.get_analog(ANALOG_RIGHT_X) * (1.0/2.0);
 		
 		chassis.arcade(leftY, rightX);
 
@@ -87,9 +102,9 @@ void opcontrol() {
 		// controller.set_text(0, 0, std::to_string(leverMotor.get_position()));
 		controller.set_text(0, 0, chassis.getPose().to_string());
 
-		if(controller.get_digital_new_press(DIGITAL_RIGHT)){
-			autonomous();
-		}
+		// if(controller.get_digital_new_press(DIGITAL_RIGHT)){
+		// 	autonomous();
+		// }
 
 		//  if(controller.get_digital_new_press(DIGITAL_A)){
 		//  	autonomous();
