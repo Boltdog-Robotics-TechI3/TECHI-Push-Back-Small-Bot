@@ -2,12 +2,12 @@
 
 void wiggle(int speed){
 	for(int i=0; i<20; i++)
-	leftMotors.move(speed+5);
-	rightMotors.move(-speed);
-	pros::delay(100);	
-	leftMotors.move(-speed);
-	rightMotors.move(speed+5);
-	pros::delay(100);
+		leftMotors.move(speed+5);
+		rightMotors.move(-speed);
+		pros::delay(100);	
+		leftMotors.move(-speed);
+		rightMotors.move(speed+5);
+		pros::delay(100);
 }
 
 /**
@@ -58,9 +58,9 @@ void competition_initialize() {}
 void autonomous() {			
 	chassis.moveToPose(Pose(-1.0,32,0),2000,50);
 	chassis.turnToAngle(-90,1500);
-	MatchLoader.extend();
+	matchLoader.extend();
 	hood.extend();
-	bottomIntakeMotors.move(-127);
+	intake.move(-127);
 	chassis.moveDistance(20,1500);
 	wiggle(40);
 	wiggle(40);
@@ -69,14 +69,11 @@ void autonomous() {
 	wiggle(40);
 	wiggle(40);
 	pros::delay(2500);
-	bottomIntakeMotors.move(0);
+	intake.move(0);
 	chassis.moveDistance(-10,1000);
 	chassis.turnToAngle(88,1500);
-	MatchLoader.retract();
+	matchLoader.retract();
 	chassis.moveDistance(35,2000);
-
-
-
 }
 
 /**
@@ -93,40 +90,14 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
  
-void opcontrol()
-{
+void opcontrol() {
 	chassis.startTracking();
 	while(true) {
-		
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(throttle,turn);
 		intakePeriodic();
 		controller.set_text(0,0,(chassis.getPose().to_string()));
-		pros::delay(20);
-
-	// if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
-	// chassis.moveToPose(Pose(-1.0,32,0),2000,50);
-	// chassis.turnToAngle(-90,1500);
-	// MatchLoader.extend();
-	// hood.extend();
-	// bottomIntakeMotors.move(-127);
-	// chassis.moveDistance(20,1500);	
-	// wiggle(40);
-	// wiggle(40);
-	// wiggle(40);
-	// wiggle(40);
-	// wiggle(40);
-	// wiggle(40);
-	// pros::delay(2500);
-	// bottomIntakeMotors.move(0);
-	// chassis.moveDistance(-10,1000);
-	// chassis.turnToAngle(88,1500);
-	// MatchLoader.retract();
-	// chassis.moveDistance(35,2000);
-
-	// }
-    		
+		pros::delay(20);	
     }
-
-	}
+}
