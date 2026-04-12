@@ -117,6 +117,12 @@ void leverPeriodic() {
     else if (controller.get_digital_new_release(DIGITAL_L2))  {
         hoodPiston.extend();
     }
+        
+    if (controller.get_digital_new_press(DIGITAL_LEFT)) {
+        matchLoadPiston.toggle();
+    }
+
+
 }
 
 void setLeverPosition(float targetPosition, float maxVel, float maxAccel) {

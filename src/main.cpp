@@ -43,9 +43,8 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-	chassis.setPose(14, 48, M_PI);
 	chassis.startTracking();
-	chassis.setPose(14, 48, M_PI);
+	chassis.setPose(14, 48, 0);
 	setLeverState(LeverState::INTAKING);
 	chassis.moveToPose({45, 9, 0}, 5000000, 50);
 	setLeverState(LeverState::IDLE);
@@ -74,8 +73,8 @@ void autonomous() {
 void opcontrol() {
 	int leftY, rightX;
 
-	chassis.setPose(14, 48, M_PI);
-	chassis.startTracking();
+	// chassis.setPose(14, 48, 0);
+	// chassis.startTracking();
 
 	while (true) {
 		leftY = controller.get_analog(ANALOG_LEFT_Y);

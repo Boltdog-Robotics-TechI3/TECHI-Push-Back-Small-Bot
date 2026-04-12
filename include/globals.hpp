@@ -28,7 +28,7 @@ inline pros::Motor leverMotor(-15, pros::v5::MotorGears::red, pros::v5::MotorUni
 inline PIDController leverPID(300, 0, 0);
 
 inline pros::adi::Pneumatics liftPiston('F', false);
-// inline pros::adi::Pneumatics matchLoadPiston('G', false);
+inline pros::adi::Pneumatics matchLoadPiston('G', false);
 inline pros::adi::Pneumatics hoodPiston('H', false);
 
 // Odometry Pieces
