@@ -5,7 +5,7 @@
 
 // Bot measurements
 inline double wheel_diameter = 3.25;
-inline double track_width = 10.75;
+inline double track_width = 11.0;
 inline double gear_ratio = 3.0/4.0;
 
 // Controller
@@ -28,7 +28,7 @@ inline TankDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, trac
 inline pros::IMU imu(11);
 // TODO: Check tracking wheel offsets and diameters
 inline TrackingWheel horizontalTrackingWheel(-1, 2.08, 3.5, WheelPosition::HORIZONTAL);
-inline TrackingWheel verticalTrackingWheel(2, 2.08, -.5, WheelPosition::VERTICAL);
+inline TrackingWheel verticalTrackingWheel(2, 2.08, .25, WheelPosition::VERTICAL);
 
 // Odometry
 inline OdomSensors odometry(&verticalTrackingWheel,&horizontalTrackingWheel , &imu);
