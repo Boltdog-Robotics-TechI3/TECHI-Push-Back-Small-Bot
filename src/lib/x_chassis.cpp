@@ -84,7 +84,7 @@ void XChassis::fieldCentricHeadingDrive(int leftX, int leftY, int rightX, int ri
  * 
  * @param targetPose The target pose to move to.
  * @param timeout The amount of time in milliseconds that the robot will try to reach the pose before giving up
- * @param maxSpeed The maximum speed the robot can travel, from 0 to 127
+ * @param maxSpeed The maximum speed the robot can travel, from 0 to 100
  */
 #warning TODO: write and test x-drive moveToPose
 void XChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
@@ -92,13 +92,16 @@ void XChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
         return;
     }
 
+
+
     isAtSetpoint = false;
 
     float moveError = 0;
     float turnError = 0;
     int moveOutput = 0;
     int turnOutput = 0;
-    float targetAngle = targetPose.getTheta();
+    float targetAngle = Pose::degToRad(targetPose.getTheta());
+    float drivingAngle = 0;
     
     Timer timeoutTimer(timeout, +[]() { Chassis::isAtSetpoint = true; }); 
     Timer smallErrorTimer(500, +[]() { Chassis::isAtSetpoint = true; });
@@ -110,10 +113,14 @@ void XChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
     movePID->setOutputLimits(-maxSpeed, maxSpeed);
     movePID->setSmallErrorRange(.3);
     movePID->setLargeErrorRange(1);
+    movePID->setIZone(6);
+    movePID->setSlewRate(500);
 
-    turnPID->setOutputLimits(-40, 40);
+    turnPID->setOutputLimits(-(30), (30));
     turnPID->setSmallErrorRange(0.02);
-    turnPID->setLargeErrorRange(0.06);
+    turnPID->setLargeErrorRange(0.04);
+    turnPID->setIZone(.5);
+    turnPID->setSlewRate(200);
 
     timeoutTimer.start();
 
@@ -129,10 +136,35 @@ void XChassis::moveToPose(const Pose& targetPose, int timeout, int maxSpeed) {
             turnError = 2*M_PI + turnError;
         }
 
-        turnOutput = turnPID->calculate(0, turnError);
-    }
-}
+        turnOutput = turnPID->calculate(turnError, 0);
 
+        drivingAngle = pose->angleTo(targetPose);
+
+        std::cout << "Move: " << moveError << "; Turn: " << turnError << "; Angle: " << drivingAngle << std::endl;
+        std::cout << "Move Out: " << moveOutput << "; Turn Out: " << turnOutput << std::endl;
+
+        driveAngle(drivingAngle, moveOutput, turnOutput);
+
+        if (movePID->isInSmallErrorRange() && turnPID->isInSmallErrorRange()) {
+            smallErrorTimer.start();
+        }
+        else if (movePID->isInLargeErrorRange() && turnPID->isInLargeErrorRange()) {
+            smallErrorTimer.stop();
+            largeErrorTimer.start();
+        }
+        else {
+            smallErrorTimer.stop();
+            largeErrorTimer.stop();
+        }
+
+        pros::delay(10);
+    }
+
+    smallErrorTimer.stop();
+    largeErrorTimer.stop();
+    timeoutTimer.stop();
+    stop();
+}
 /**       
  * @brief Turn the robot to a specific angle using PID control.
  * 0 Degrees is facing "forward" from the starting orientation.
@@ -153,7 +185,7 @@ void XChassis::turnToAngle(double targetAngle, int timeout) {
     turnPID->reset();
     turnPID->setOutputLimits(-45, 45);
     turnPID->setSmallErrorRange(0.02);
-    turnPID->setLargeErrorRange(0.08);
+    turnPID->setLargeErrorRange(0.04);
     turnPID->setIZone(.5);
 
     timeoutTimer.start();
@@ -166,9 +198,9 @@ void XChassis::turnToAngle(double targetAngle, int timeout) {
         else if (error < -M_PI) {
             error = 2*M_PI + error;
         }
-
-        int output = turnPID->calculate(0, error);
-        drivetrain->setMotorSpeeds({output, output, output, output});
+ 
+        int output = turnPID->calculate(error, 0);
+        driveAngle(0, 0, output);
 
         if (turnPID->isInSmallErrorRange()) {
             smallErrorTimer.start();
