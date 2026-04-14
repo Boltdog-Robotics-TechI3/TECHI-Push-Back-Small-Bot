@@ -34,7 +34,7 @@ inline TrackingWheel verticalTrackingWheel(-2, 2.08, 0, WheelPosition::VERTICAL)
 inline OdomSensors odometry(&verticalTrackingWheel,&horizontalTrackingWheel , &imu);
 inline PIDController lateral(5,0,0);
 inline PIDController turn(70,0,10.0);
-inline PIDController align(60,0,0);
+inline PIDController align(50,0,0);
 // Chassis
 inline TankChassis chassis(&drivetrain, &odometry,&lateral,&turn,&align);
 

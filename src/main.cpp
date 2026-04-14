@@ -58,6 +58,20 @@ void competition_initialize() {}
 void autonomous() {			
 	// when making the auto make sure the speed is capped at 60% (127 *.6) so that
 	// the robot doesn't go past the error range.
+	chassis.startTracking();
+	matchLoader.retract();
+	chassis.setPose({22, -42, M_PI/2});
+	double maxSpeed = 127*0.6;
+	chassis.moveToPose({54, -42, M_PI/2}, 5000, maxSpeed);
+	matchLoader.extend();
+	chassis.turnToAngle(0, 5000);
+	intake.move(127);
+	chassis.moveToPose({54, -57, 0}, 1000, 127);
+	lift.extend();
+	chassis.moveToPose({54, -36, 0}, 2000, maxSpeed);
+	intake.move(0);
+	chassis.turnToAngle(0, 5000);
+	//not aligning with the goal, fix for later
 }
 
 /**
@@ -76,6 +90,7 @@ void autonomous() {
  
 void opcontrol() {
 	chassis.startTracking();
+	matchLoader.retract();
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
