@@ -43,33 +43,59 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+
+	//chassis.startTracking();
+	// chassis.setPose(0, 0, 0);
+	//chassis.moveToPose({20, 20, 0}, 5000000, 80);
 	chassis.startTracking();
-	chassis.setPose(14, 48, 0);
+	chassis.setPose(14, 48, 0); // starting point
 	setLeverState(LeverState::INTAKING);
-	chassis.moveToPose({45, 7, 0}, 5000000, 50);
-	setLeverState(LeverState::IDLE);
-	chassis.moveToPose({13, 13, 0}, 5000, 100);
-	chassis.turnToAngle(135,5000);
+	hoodPiston.extend(); // open hood
+	chassis.moveToPose({45, 7, 0}, 5000000, 80); // pick up 2 blocks under long goal
+	//setLeverState(LeverState::IDLE);
+	chassis.moveToPose({11, 11, 0}, 2000, 80); // go to mid score
+	chassis.turnToAngle(130,2000); // line up with mid goal
+	setLeverPosition(200, 60, 100); // get rid of blocks
+	setLeverPosition(0, 100, 100); // reset lever
+	hoodPiston.retract();
 	//setLeverState(LeverState::OUTTAKING);
 	setLeverState(LeverState::INTAKING);
-	chassis.moveToPose({49, 48, 0}, 5000, 100);
-	chassis.turnToAngle(180,5000);
-	matchLoadPiston.extend();
-	liftPiston.extend();
-	chassis.moveToPose({48.5, 58, 0}, 2000, 100);
-	chassis.moveToPose({48.5, 55, 0}, 2000, 100);
-	chassis.moveToPose({48.5, 58, 0}, 2000, 100);
-	chassis.moveToPose({48.5, 32, 0}, 2000, 100);
-	matchLoadPiston.retract();
-	hoodPiston.extend();
-	setLeverPosition(100,100,100);
-	setLeverPosition(0,100,100);
-	chassis.setPose(48.5, 32, 0);
-	chassis.moveToPose({48.5, 48, 0}, 5000, 100);
-	chassis.turnToAngle(30,5000);
-	setLeverPosition(100,100,100);
-	setLeverPosition(0,100,100);
-	controller.set_text(0,0, chassis.getPose().to_string());
+	chassis.moveToPose({49, 48, 0}, 5000, 80); // line up with match load
+	chassis.turnToAngle(180,5000); // face match load
+	matchLoadPiston.extend(); // lower match load
+	liftPiston.extend(); // raise lift
+	hoodPiston.retract(); // close hood
+	chassis.moveToPose({48.5, 60, 0}, 400, 80); // ram to match load
+	chassis.moveToPose({48.5, 55, 0}, 400, 80); // back up
+	chassis.moveToPose({48.5, 60, 0}, 400, 80); // ram to match load
+	chassis.moveToPose({48.5, 15, 0}, 2000, 80); // go to long goal
+	hoodPiston.extend(); // open hood
+	setLeverPosition(200,127,127); // score high
+	setLeverPosition(0,100,100); // reset lever
+	// chassis.setPose(48.5, 15, M_PI_2); // reset position
+	// chassis.startTracking();
+	chassis.moveToPose({49, 48, 0}, 5000, 80); // line up with match load
+	liftPiston.extend(); // raise lift
+	hoodPiston.retract(); // close hood
+	chassis.moveToPose({48.5, 60, 0}, 400, 80); // ram to match load
+	chassis.moveToPose({48.5, 55, 0}, 400, 80); // back up
+	chassis.moveToPose({48.5, 60, 0}, 400, 80); // ram to match load
+	liftPiston.retract();
+	hoodPiston.extend(); // open hood
+	setLeverState((LeverState)7);
+	setLeverPosition(200,127,127); // lever out blocks
+	setLeverPosition(0,100,100); // reset lever
+	setIntakeSpeed(0);
+	hoodPiston.retract(); // close hood
+	liftPiston.extend(); // raise lift
+	chassis.moveToPose({48.5, 60, 0}, 800, 80); // ram to match load
+	chassis.moveToPose({48.5, 55, 0}, 800, 80); // back up
+	chassis.moveToPose({48.5, 60, 0}, 800, 80); // ram to match load
+	chassis.moveToPose({48.5, 15, 0}, 2000, 80); // go to long goal
+	hoodPiston.extend(); // open hood
+	setLeverPosition(200,127,127); // score high
+	setLeverPosition(0,100,100); // reset lever
+	controller.set_text(0, 0, chassis.getPose().to_string());
 }
 
 /**
@@ -100,11 +126,11 @@ void opcontrol() {
 		leverPeriodic();
 
 		// controller.set_text(0, 0, std::to_string(leverMotor.get_position()));
-		controller.set_text(0, 0, chassis.getPose().to_string());
+//		controller.set_text(0, 0, chassis.getPose().to_string());
 
-		// if(controller.get_digital_new_press(DIGITAL_RIGHT)){
-		// 	autonomous();
-		// }
+		 if(controller.get_digital_new_press(DIGITAL_RIGHT)){
+		 	autonomous();
+		 }
 
 		//  if(controller.get_digital_new_press(DIGITAL_A)){
 		//  	autonomous();
