@@ -56,24 +56,8 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {			
-	chassis.moveToPose(Pose(-1.0,32,0),2000,50);
-	chassis.turnToAngle(-90,1500);
-	matchLoader.extend();
-	hood.extend();
-	intake.move(-127);
-	chassis.moveDistance(20,1500);
-	wiggle(40);
-	wiggle(40);
-	wiggle(40);
-	wiggle(40);
-	wiggle(40);
-	wiggle(40);
-	pros::delay(2500);
-	intake.move(0);
-	chassis.moveDistance(-10,1000);
-	chassis.turnToAngle(88,1500);
-	matchLoader.retract();
-	chassis.moveDistance(35,2000);
+	// when making the auto make sure the speed is capped at 60% (127 *.6) so that
+	// the robot doesn't go past the error range.
 }
 
 /**
@@ -98,6 +82,7 @@ void opcontrol() {
 		chassis.arcade(throttle,turn);
 		intakePeriodic();
 		controller.set_text(0,0,(chassis.getPose().to_string()));
-		pros::delay(20);	
+		pros::delay(20);
+		
     }
 }

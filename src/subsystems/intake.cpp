@@ -89,5 +89,21 @@ void intakePeriodic()
         leverTimeoutReached = false;
         fire();
     }
+
+        // PID tune
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
+        chassis.setBrakeMode(pros::motor_brake_mode_e::E_MOTOR_BRAKE_BRAKE);
+        chassis.moveToPose({0, 72, 0}, 5000, 127*0.6);
+    }
+
+
+
+
+
+
+
+
+
+    
     
 }
