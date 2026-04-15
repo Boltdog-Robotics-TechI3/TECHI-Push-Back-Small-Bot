@@ -27,10 +27,6 @@ void intakeInitialize()
     lever.set_brake_mode(pros::MotorBrake::brake);
 }
 
-void resetLever() {
-
-}
-
 void fire() {
     if (leverTimer == nullptr) {
         leverTimer = new Timer(1000, onLeverTimeout);
@@ -52,6 +48,10 @@ void fire() {
             leverTimer->stop();
         }
     }
+}
+
+void countBlocks() {
+    
 }
 
 void intakePeriodic()

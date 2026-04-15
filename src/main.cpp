@@ -1,4 +1,11 @@
 #include "main.h"
+#include "globals.hpp"
+#include <string>
+
+namespace {
+	int count = 0;
+	void blockCallback() { };
+}
 
 void wiggle(int speed){
 	for(int i=0; i<20; i++)
@@ -91,12 +98,25 @@ void autonomous() {
 void opcontrol() {
 	chassis.startTracking();
 	matchLoader.retract();
+	Timer blockTimer(200, blockCallback);
+	double previousIntakeSpeed = 0;
+	
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
+		double intakeVelocity = intake.get_actual_velocity();
 		chassis.arcade(throttle,turn);
 		intakePeriodic();
-		controller.set_text(0,0,(chassis.getPose().to_string()));
+		//controller.set_text(0,0,(chassis.getPose().to_string()));
+		if (intakeVelocity < 150) {
+			if (!blockTimer.isRunning()) { blockTimer.start(); }
+			//controller.set_text(0, 0, std::to_string(intakeVelocity ));
+		}
+		if (blockTimer.isRunning() && intakeVelocity >= 200) {
+			count++;
+			blockTimer.stop();
+		}
+		controller.set_text(0, 0, std::to_string(count) + " " + std::to_string(intakeVelocity < 150) + " " + std::to_string(intakeVelocity >= 200));
 		pros::delay(20);
 		
     }
