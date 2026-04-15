@@ -77,10 +77,7 @@ void opcontrol(void);
  */
 //#include <iostream>
 #include "lib/api.hpp"
-#include "globals.hpp"
-#include "subsystems/lever.hpp"
-#include "subsystems/autos.hpp"
-#include "screen.h"
+
 
 #endif
 
