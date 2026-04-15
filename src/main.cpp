@@ -118,6 +118,5 @@ void opcontrol() {
 		}
 		controller.set_text(0, 0, std::to_string(count) + " " + std::to_string(intakeVelocity < 150) + " " + std::to_string(intakeVelocity >= 200));
 		pros::delay(20);
-		
-    }
+	}
 }
