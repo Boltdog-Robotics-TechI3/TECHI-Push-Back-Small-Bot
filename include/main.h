@@ -35,6 +35,7 @@
 #define PROS_USE_LITERALS
 
 #include "api.h"
+#include "liblvgl/lvgl.h"
 
 /**
  * You should add more #includes here
@@ -76,6 +77,11 @@ void opcontrol(void);
  */
 //#include <iostream>
 #include "lib/api.hpp"
+#include "globals.hpp"
+#include "subsystems/lever.hpp"
+#include "subsystems/autos.hpp"
+#include "screen.h"
+
 #endif
 
 #endif  // _PROS_MAIN_H_
