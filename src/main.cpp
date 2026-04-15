@@ -98,6 +98,5 @@ void opcontrol() {
 		intakePeriodic();
 		controller.set_text(0,0,(chassis.getPose().to_string()));
 		pros::delay(20);
-		
-    }
+	}
 }
