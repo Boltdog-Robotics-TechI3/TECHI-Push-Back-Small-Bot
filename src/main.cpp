@@ -61,16 +61,16 @@ void autonomous() {
 	chassis.startTracking();
 	matchLoader.retract();
 	chassis.setPose({22, -42, M_PI/2});
-	double maxSpeed = 127*0.6;
-	chassis.moveToPose({54, -42, M_PI/2}, 5000, maxSpeed);
+	int maxSpeed = 127*0.6;
+	chassis.moveToPose({.targetPose ={54, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
-	chassis.turnToAngle(0, 5000);
+	chassis.turnToAngle({.targetAngle = 0});
 	intake.move(127);
-	chassis.moveToPose({54, -57, 0}, 1000, 127);
+	chassis.moveToPose({.targetPose ={54, -57, 0}, .timeout = 1000, .maxMoveSpeed = 127});
 	lift.extend();
-	chassis.moveToPose({54, -36, 0}, 2000, maxSpeed);
+	chassis.moveToPose({.targetPose = {54, -36, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed});
 	intake.move(0);
-	chassis.turnToAngle(0, 5000);
+	chassis.turnToAngle({.targetAngle = 0});
 	//not aligning with the goal, fix for later
 }
 
