@@ -14,6 +14,7 @@ namespace {
             leverReset = false;
         } else {
             leverReset = true;
+            hood.retract();
         }
         lever.brake(); 
     }
@@ -71,11 +72,7 @@ void intakePeriodic()
     }
 
     // Wing & Hood
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
-        hood.retract();
-    }
-
-    if(controller.get_digital_new_release(pros::E_CONTROLLER_DIGITAL_A)){
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)){
         hood.extend();
     }
 
