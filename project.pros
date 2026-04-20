@@ -1,7 +1,11 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
+<<<<<<< HEAD
     "project_name": "Smallbot",
+=======
+    "project_name": "Template",
+>>>>>>> upstream/main
     "target": "v5",
     "templates": {
       "kernel": {
