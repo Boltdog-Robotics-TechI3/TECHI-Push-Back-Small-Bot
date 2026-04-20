@@ -71,23 +71,24 @@ void intakePeriodic()
         lift.toggle();
     }
 
-    // Wing & Hood
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)){
-        hood.extend();
-    }
-
     // Match Load
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)){
         matchLoader.toggle();
     }
 
+    // hood and wing
+    if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
+        hood.extend();
+    } else{
+        hood.retract();
+    }
+
     // Lever
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) || leverTimeoutReached == false) {
+        hood.extend();
         leverTimeoutReached = false;
         fire();
     }
-
-
 
 
 

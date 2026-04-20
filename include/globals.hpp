@@ -15,11 +15,13 @@ inline pros::Controller controller(pros::E_CONTROLLER_MASTER);
 inline pros::MotorGroup rightMotors({-10, -19, 18, 17});
 inline pros::MotorGroup leftMotors({-13, 14, -15, 16});
 inline pros::Motor intake(20);
-inline pros::Motor lever(12); 
+inline pros::MotorGroup lever({-3, 12});
+
 
 inline pros::adi::Pneumatics lift('b', false);
-inline pros::adi::Pneumatics hood('a', false);
+inline pros::adi::Pneumatics hood('a', false, true);
 inline pros::adi::Pneumatics matchLoader('h', false);
+
 
 // Drivetrain
 inline TankDrivetrain drivetrain(&leftMotors, &rightMotors, wheel_diameter, track_width, gear_ratio);
