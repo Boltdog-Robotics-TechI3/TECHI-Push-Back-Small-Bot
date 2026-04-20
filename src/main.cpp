@@ -1,13 +1,15 @@
 #include "main.h"
+#include "globals.hpp"
 
 void wiggle(int speed){
-	for(int i=0; i<20; i++)
+	for(int i=0; i<20; i++) {
 		leftMotors.move(speed+5);
 		rightMotors.move(-speed);
 		pros::delay(100);	
 		leftMotors.move(-speed);
 		rightMotors.move(speed+5);
 		pros::delay(100);
+	}
 }
 
 /**
@@ -91,12 +93,13 @@ void autonomous() {
 void opcontrol() {
 	chassis.startTracking();
 	matchLoader.retract();
+	
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(throttle,turn);
-		intakePeriodic();
 		controller.set_text(0,0,(chassis.getPose().to_string()));
+		intakePeriodic();
 		pros::delay(20);
 	}
 }
