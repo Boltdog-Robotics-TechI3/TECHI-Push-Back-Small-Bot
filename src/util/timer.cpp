@@ -1,4 +1,3 @@
-#include "api.h"
 #include <climits>
 #include "util/timer.hpp"
 
@@ -13,7 +12,6 @@ Timer::~Timer() {
 
 void Timer::start() {
     if (!running) {
-        pros::lcd::print(5, "Timer Start Running %d", pros::millis());
         task.resume();
         running = true;
     }

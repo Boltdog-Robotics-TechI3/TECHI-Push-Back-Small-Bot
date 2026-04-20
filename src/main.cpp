@@ -1,20 +1,15 @@
 #include "main.h"
 #include "globals.hpp"
-#include <string>
-
-namespace {
-	int count = 0;
-	void blockCallback() { };
-}
 
 void wiggle(int speed){
-	for(int i=0; i<20; i++)
+	for(int i=0; i<20; i++) {
 		leftMotors.move(speed+5);
 		rightMotors.move(-speed);
 		pros::delay(100);	
 		leftMotors.move(-speed);
 		rightMotors.move(speed+5);
 		pros::delay(100);
+	}
 }
 
 /**
@@ -68,16 +63,16 @@ void autonomous() {
 	chassis.startTracking();
 	matchLoader.retract();
 	chassis.setPose({22, -42, M_PI/2});
-	double maxSpeed = 127*0.6;
-	chassis.moveToPose({54, -42, M_PI/2}, 5000, maxSpeed);
+	int maxSpeed = 127*0.6;
+	chassis.moveToPose({.targetPose={54, -42, M_PI/2}, .maxMoveSpeed=maxSpeed});
 	matchLoader.extend();
-	chassis.turnToAngle(0, 5000);
+	chassis.turnToAngle({.targetAngle=0, .timeout=2500});
 	intake.move(127);
-	chassis.moveToPose({54, -57, 0}, 1000, 127);
+	chassis.moveToPose({.targetPose={54, -57, 0}, .timeout=1000, .maxMoveSpeed=127});
 	lift.extend();
-	chassis.moveToPose({54, -36, 0}, 2000, maxSpeed);
+	chassis.moveToPose({.targetPose={54, -36, 0}, .timeout=2000, .maxMoveSpeed=maxSpeed});
 	intake.move(0);
-	chassis.turnToAngle(0, 5000);
+	chassis.turnToAngle({.targetAngle=0});
 	//not aligning with the goal, fix for later
 }
 
@@ -98,25 +93,13 @@ void autonomous() {
 void opcontrol() {
 	chassis.startTracking();
 	matchLoader.retract();
-	Timer blockTimer(200, blockCallback);
-	double previousIntakeSpeed = 0;
 	
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
-		double intakeVelocity = intake.get_actual_velocity();
 		chassis.arcade(throttle,turn);
+		controller.set_text(0,0,(chassis.getPose().to_string()));
 		intakePeriodic();
-		//controller.set_text(0,0,(chassis.getPose().to_string()));
-		if (intakeVelocity < 150) {
-			if (!blockTimer.isRunning()) { blockTimer.start(); }
-			//controller.set_text(0, 0, std::to_string(intakeVelocity ));
-		}
-		if (blockTimer.isRunning() && intakeVelocity >= 200) {
-			count++;
-			blockTimer.stop();
-		}
-		controller.set_text(0, 0, std::to_string(count) + " " + std::to_string(intakeVelocity < 150) + " " + std::to_string(intakeVelocity >= 200));
 		pros::delay(20);
 	}
 }

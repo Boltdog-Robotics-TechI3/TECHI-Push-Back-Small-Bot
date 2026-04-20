@@ -12,13 +12,7 @@ class Timer {
         std::atomic<bool> running = false;
         pros::Task task = pros::Task([this]() {
             while (true) {
-                
-                // Check if the task restarts upon resuming
-                // Ensure the correct task is being suspended/resumed
-                // Maybe use pros::Task::current() instead of this->task
-                pros::lcd::print(2, "Timer Running %d", pros::millis());
                 task.suspend();
-                pros::lcd::print(0, "Timer Resumed %d", pros::millis());
                 pros::delay(this->time);
                 if (running && callback) {
                     running = false;
