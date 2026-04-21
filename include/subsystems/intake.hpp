@@ -4,3 +4,4 @@
 
 void intakeInitialize();
 void intakePeriodic();
+void fire();
