@@ -1,4 +1,20 @@
 #include "main.h"
+#include "globals.hpp"
+#include "pros/rtos.h"
+#include "subsystems/intake.hpp"
+#include <string>
+
+
+void wiggle(int speed){
+	for(int i=0; i<20; i++) {
+		leftMotors.move(speed+5);
+		rightMotors.move(-speed);
+		pros::delay(100);	
+		leftMotors.move(-speed);
+		rightMotors.move(speed+5);
+		pros::delay(100);
+	}
+}
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -6,7 +22,15 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize()
+{
+
+	initializeScreen();
+	imu.reset(true);
+	chassis.reset();
+	intakeInitialize();
+	chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -37,7 +61,36 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {			
+	// when making the auto make sure the speed is capped at 60% (127 *.6) so that
+	// the robot doesn't go past the error range.
+	chassis.startTracking();
+	matchLoader.retract();
+	chassis.setPose({22, -42, M_PI/2});
+	int maxSpeed = 127*0.6;
+	chassis.moveToPose({.targetPose ={55, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
+	matchLoader.extend();
+	chassis.turnToAngle({.targetAngle = 0});
+	lift.extend();
+	hood.extend();
+	startCounting();
+	intake.move(127);
+	chassis.moveToPose({.targetPose ={55, -55, 0}, .timeout = 1000, .maxMoveSpeed = 127});
+	int time = pros::c::millis();
+	while (blockCount < 3) {
+		pros::delay(25); 
+		//timeout
+		if (pros::c::millis() - time < 5000)
+			break;
+	}
+	chassis.moveToPose({.targetPose = {56, -12, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed}); //goto score
+	intake.move(0);
+	chassis.turnToAngle({.targetAngle = 0, .timeout = 1000});
+	fire(false);
+	controller.set_text(0,0, std::to_string(blockCount));
+	pros::delay(5000);
+	//not aligning with the goal, fix for later
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -52,8 +105,18 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+ 
 void opcontrol() {
-	while (true) {
+	chassis.startTracking();
+	matchLoader.retract();
+	startCounting();
+	
+	while(true) {
+		int throttle = controller.get_analog(ANALOG_LEFT_Y);
+		int turn = controller.get_analog(ANALOG_RIGHT_X);
+		chassis.arcade(throttle,turn);
+		controller.set_text(0,0,std::to_string(blockCount));
+		intakePeriodic();
 		pros::delay(20);
 	}
 }
