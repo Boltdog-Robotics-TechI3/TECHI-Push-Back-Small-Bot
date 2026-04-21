@@ -1,12 +1,11 @@
 #include "subsystems/intake.hpp"
 #include "globals.hpp"
 #include "pros/motors.h"
+#include "pros/rtos.h"
 #include "pros/rtos.hpp"
 
 #include <atomic>
-
-std::atomic<int> blockCount{0};
-std::atomic<bool> counting = false;
+#include <string>
 
 namespace {
     bool leverReset = false; // Flag to determine if the lever is resetting
@@ -43,6 +42,10 @@ void fire(bool async=false) {
         leverTimer = new Timer(1000, onLeverTimeout); // Timer to determine if lever is stopped
     }
 
+    if (!async) {
+        leverTimeoutReached = false;
+    }
+
     while (leverTimeoutReached == false) {
         if (leverReset) {
             lever.move(-127);
@@ -61,6 +64,7 @@ void fire(bool async=false) {
 
         // Inner loops don't work well with control loops, return to caller and let the control loop handle the logic
         if (async) { return; }
+        pros::delay(20);
     }
 }
 
@@ -130,7 +134,7 @@ void intakePeriodic()
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) || leverTimeoutReached == false) {
         hood.extend();
         leverTimeoutReached = false;
-        fire(true);
+        fire(false);
     }
 
 

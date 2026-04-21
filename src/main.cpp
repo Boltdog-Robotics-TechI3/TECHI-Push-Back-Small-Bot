@@ -1,5 +1,8 @@
 #include "main.h"
 #include "globals.hpp"
+#include "pros/rtos.h"
+#include "subsystems/intake.hpp"
+#include <string>
 
 void wiggle(int speed){
 	for(int i=0; i<20; i++) {
@@ -64,15 +67,27 @@ void autonomous() {
 	matchLoader.retract();
 	chassis.setPose({22, -42, M_PI/2});
 	int maxSpeed = 127*0.6;
-	chassis.moveToPose({.targetPose ={54, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
+	chassis.moveToPose({.targetPose ={55, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
 	chassis.turnToAngle({.targetAngle = 0});
-	intake.move(127);
-	chassis.moveToPose({.targetPose ={54, -57, 0}, .timeout = 1000, .maxMoveSpeed = 127});
 	lift.extend();
-	chassis.moveToPose({.targetPose = {54, -36, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed});
+	hood.extend();
+	startCounting();
+	intake.move(127);
+	chassis.moveToPose({.targetPose ={55, -55, 0}, .timeout = 1000, .maxMoveSpeed = 127});
+	int time = pros::c::millis();
+	while (blockCount < 3) {
+		pros::delay(25); 
+		//timeout
+		if (pros::c::millis() - time < 5000)
+			break;
+	}
+	chassis.moveToPose({.targetPose = {56, -12, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed}); //goto score
 	intake.move(0);
-	chassis.turnToAngle({.targetAngle = 0});
+	chassis.turnToAngle({.targetAngle = 0, .timeout = 1000});
+	fire(false);
+	controller.set_text(0,0, std::to_string(blockCount));
+	pros::delay(5000);
 	//not aligning with the goal, fix for later
 }
 
@@ -93,12 +108,13 @@ void autonomous() {
 void opcontrol() {
 	chassis.startTracking();
 	matchLoader.retract();
+	startCounting();
 	
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(throttle,turn);
-		controller.set_text(0,0,(chassis.getPose().to_string()));
+		controller.set_text(0,0,std::to_string(blockCount));
 		intakePeriodic();
 		pros::delay(20);
 	}
