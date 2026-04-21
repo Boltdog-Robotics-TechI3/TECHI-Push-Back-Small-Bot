@@ -69,5 +69,5 @@ Pose Pose::rotate(double angle) {
 }
 
 std::string Pose::to_string() {
-    return std::format("X: {:.2f} Y: {:.2f} θ: {:.2f}", x, y, theta);
+    return std::format("X: {:.2f} Y: {:.2f} T: {:.2f}", x, y, theta);
 }

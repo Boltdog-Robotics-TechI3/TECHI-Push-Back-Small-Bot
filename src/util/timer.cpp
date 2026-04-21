@@ -12,8 +12,8 @@ Timer::~Timer() {
 
 void Timer::start() {
     if (!running) {
-        task.resume();
         running = true;
+        task.resume();
     }
 }
 
