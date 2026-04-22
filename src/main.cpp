@@ -68,13 +68,14 @@ void autonomous() {
 	matchLoader.retract();
 	chassis.setPose({22, -42, M_PI/2});
 	int maxSpeed = 127*0.6;
-	chassis.moveToPose({.targetPose ={55, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
+	int lowSpeed = 127 * 0.4;
+	chassis.moveToPose({.targetPose ={54.5, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
 	lift.extend();
 	chassis.turnToAngle({.targetAngle = 0});
 	hood.extend();
 	startCounting();
-	intake.move(95);
+	intake.move(127*0.7);
 	chassis.moveToPose({.targetPose ={55, -56, 0}, .timeout = 1000, .maxMoveSpeed = 127});
 	//int time = pros::c::millis();
 	// while (blockCount < 3) {
@@ -94,7 +95,7 @@ void autonomous() {
 	// hood.retract();
 	matchLoader.extend();
 	intake.move(127);
-	chassis.moveToPose({.targetPose ={54.5, -54.5, 0}, .timeout = 3000, .maxMoveSpeed = maxSpeed});
+	chassis.moveToPose({.targetPose ={54.5, -54.5, 0}, .timeout = 3000, .maxMoveSpeed = lowSpeed});
 	pros::delay(2500);
 	intake.move(0);
 	chassis.moveToPose({.targetPose = {24, -24, 0}, .timeout = 2500, .maxMoveSpeed = maxSpeed, .turnStartTime = 10});
