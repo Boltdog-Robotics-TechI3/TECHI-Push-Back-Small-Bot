@@ -143,8 +143,6 @@ void TankChassis::moveToPose(moveToPoseParams params) {
         } else {
             largeErrorTimer->stop();
         }  
-        
-		pros::delay(20);
     }
 
     smallErrorTimer->stop();
@@ -153,6 +151,7 @@ void TankChassis::moveToPose(moveToPoseParams params) {
     failsafeTimer->stop();
     enableTurningTimer->stop();
     stop();
+    pros::delay(20);
 }
 
 /**
@@ -275,11 +274,10 @@ void TankChassis::turnToAngle(turnToAngleParams params) {
             smallErrorTimer->stop();
             largeErrorTimer->stop();
         }
-
-        pros::delay(20);
     }
     smallErrorTimer->stop();
     largeErrorTimer->stop();
     timeoutTimer->stop();
     stop();
+    pros::delay(20);
 }

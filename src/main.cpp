@@ -70,25 +70,39 @@ void autonomous() {
 	int maxSpeed = 127*0.6;
 	chassis.moveToPose({.targetPose ={55, -42, M_PI/2}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
-	chassis.turnToAngle({.targetAngle = 0});
 	lift.extend();
+	chassis.turnToAngle({.targetAngle = 0});
 	hood.extend();
 	startCounting();
-	intake.move(127);
-	chassis.moveToPose({.targetPose ={55, -55, 0}, .timeout = 1000, .maxMoveSpeed = 127});
-	int time = pros::c::millis();
-	while (blockCount < 3) {
-		pros::delay(25); 
-		//timeout
-		if (pros::c::millis() - time < 5000)
-			break;
-	}
+	intake.move(95);
+	chassis.moveToPose({.targetPose ={55, -56, 0}, .timeout = 1000, .maxMoveSpeed = 127});
+	//int time = pros::c::millis();
+	// while (blockCount < 3) {
+	// 	pros::delay(25); 
+	// 	//timeout
+	// 	if (pros::c::millis() - time < 5000)
+	// 		break;
+	// }
+	pros::delay(1200);
+	//controller.set_text(0,0, std::to_string(blockCount));
 	chassis.moveToPose({.targetPose = {56, -12, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed}); //goto score
-	intake.move(0);
+	// intake.move(0);
 	chassis.turnToAngle({.targetAngle = 0, .timeout = 1000});
 	fire(false);
-	controller.set_text(0,0, std::to_string(blockCount));
-	pros::delay(5000);
+	// //go back to get the rest of the blocks
+	pros::delay(1000);
+	// hood.retract();
+	matchLoader.extend();
+	intake.move(127);
+	chassis.moveToPose({.targetPose ={54.5, -54.5, 0}, .timeout = 3000, .maxMoveSpeed = maxSpeed});
+	pros::delay(2500);
+	intake.move(0);
+	chassis.moveToPose({.targetPose = {24, -24, 0}, .timeout = 2500, .maxMoveSpeed = maxSpeed, .turnStartTime = 10});
+	hood.extend();
+	fire(false);
+
+
+	pros::delay(3000);
 	//not aligning with the goal, fix for later
 }
 

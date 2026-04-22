@@ -71,26 +71,27 @@ void fire(bool async=false) {
 void countBlocks() {
     // Tasks start upon creation. This loops forces it to wait until its needed.
     // while (pros::Task::current().notify_take(true, TIMEOUT_MAX)) { pros::delay(20); };
-    Timer blockTimer(100, []{});
-    bool intaking;
+    Timer cooldownTimer(325, []{});
+    Timer warmupTimer(200, []{});
+    bool intaking = false;
+    double previousVelocity = 0;
     while (true) {
         if (counting) {
             double intakeVelocity = intake.get_actual_velocity();
-            if (intakeVelocity < 150 && intaking) {
-                blockTimer.start();
-            } else if (blockTimer.isRunning() && intakeVelocity >= 200) {
+            if (intake.get_torque() > 0.5 && !cooldownTimer.isRunning() && !warmupTimer.isRunning()) {
                 blockCount++;
-                blockTimer.stop();
-            } else {
-                intaking = intakeVelocity >= 150;
+                cooldownTimer.start();
             }
+            if (previousVelocity*2 < intakeVelocity && !warmupTimer.isRunning()) {
+                warmupTimer.start();
+            }
+            previousVelocity = intakeVelocity;
         } else {
             blockCount = 0;
             pros::Task::current().suspend(); // Task will suspend itself, so it resumes from a consistent location
             counting = true; // Task resumes from here, start counting
             intaking = false;
         }
-        pros::delay(20);
     }
 
 }
