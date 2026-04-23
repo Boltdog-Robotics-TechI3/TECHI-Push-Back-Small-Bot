@@ -147,13 +147,6 @@ void intakePeriodic()
         leverTimeoutReached = false;
         fire(true, 90);
     }
-
-
-
-
-
-
-
     
     
 }
