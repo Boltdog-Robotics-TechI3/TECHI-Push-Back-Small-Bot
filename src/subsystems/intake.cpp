@@ -8,7 +8,7 @@
 #include <string>
 
 namespace {
-    bool leverReset = false; // Flag to determine if the lever is resetting
+    std::atomic<bool> leverReset{false}; // Flag to determine if the lever is resetting
     std::atomic<bool> leverTimeoutReached{true}; // Flag to determine if the lever has fired and reset
     void onLeverTimeout() {
         if (leverReset) {
@@ -39,7 +39,7 @@ void intakeInitialize()
  */
 void fire(bool async=false) {
     if (leverTimer == nullptr) {
-        leverTimer = new Timer(1000, onLeverTimeout); // Timer to determine if lever is stopped
+        leverTimer = new Timer(400, onLeverTimeout); // Timer to determine if lever is stopped
     }
 
     if (!async) {
@@ -135,7 +135,7 @@ void intakePeriodic()
     if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) || leverTimeoutReached == false) {
         hood.extend();
         leverTimeoutReached = false;
-        fire(false);
+        fire(true);
     }
 
 

@@ -11,7 +11,7 @@ class Timer {
         int startTime = 0;
         bool initialized = false;
         std::atomic<bool> running = false;
-        pros::Task task = pros::Task([this]() {
+        pros::Task task = pros::Task([&]() {
             while (true) {
                 task.suspend();
                 startTime = pros::millis();
