@@ -5,7 +5,7 @@
 
 
 void wiggle(int speed){
-	for(int i=0; i<20; i++) {
+	for(int i=0; i<10; i++) {
 		leftMotors.move(speed+5);
 		rightMotors.move(-speed);
 		pros::delay(100);	
@@ -69,7 +69,7 @@ void autonomous() {
 	chassis.setPose({14.5, -47.5, M_PI_2});
 	int maxSpeed = 127*0.6;
 	int lowSpeed = 127 * 0.4;
-	chassis.moveToPose({.targetPose = {47, -47.5, 0}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
+	chassis.moveToPose({.targetPose = {46, -47.5, 0}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
 	lift.extend();
 	chassis.turnToAngle({.targetAngle = 0});
@@ -87,12 +87,11 @@ void autonomous() {
 	pros::delay(1000);
 	//controller.set_text(0,0, std::to_string(blockCount));
 	chassis.moveToPose({.targetPose = {47, -28.5, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed}); //goto score
+	wiggle(10);
 	// intake.move(0);
 	chassis.turnToAngle({.targetAngle = 0, .timeout = 1000});
 
 	fire(false);
-
-
 
 	// //go back to get the rest of the blocks
 	pros::delay(3000);
@@ -115,6 +114,9 @@ void autonomous() {
 
 	// TODO: Score remaining blocks
 	chassis.moveToPose({.targetPose = {47, -28.5, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed});
+	controller.set_text(0, 0, chassis.getPose().to_string());
+	intake.move(0);
+
 
 }
 

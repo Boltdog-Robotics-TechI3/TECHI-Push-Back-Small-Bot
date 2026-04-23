@@ -10,6 +10,7 @@
 namespace {
     std::atomic<bool> leverReset{false}; // Flag to determine if the lever is resetting
     std::atomic<bool> leverTimeoutReached{true}; // Flag to determine if the lever has fired and reset
+    bool isMidScore = false;
     void onLeverTimeout() {
         if (leverReset) {
             leverTimeoutReached = true;
@@ -37,7 +38,7 @@ void intakeInitialize()
  *
  * @param async Whether the function should run asynchronously or not.
  */
-void fire(bool async=false) {
+void fire(bool async=false, int speed) {
     if (leverTimer == nullptr) {
         leverTimer = new Timer(400, onLeverTimeout); // Timer to determine if lever is stopped
     }
@@ -48,9 +49,9 @@ void fire(bool async=false) {
 
     while (leverTimeoutReached == false) {
         if (leverReset) {
-            lever.move(-127);
+            lever.move(-speed);
         } else {
-            lever.move(127);
+            lever.move(speed);
         }
         
         bool leverStopped = std::abs(lever.get_actual_velocity()*1.5) < abs(lever.get_target_velocity());
@@ -131,11 +132,20 @@ void intakePeriodic()
         hood.retract();
     }
 
-    // Lever
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) || leverTimeoutReached == false) {
+    // normal Lever
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) || (leverTimeoutReached == false && isMidScore == false)) {
+        isMidScore == false;
         hood.extend();
         leverTimeoutReached = false;
         fire(true);
+    }
+
+    // middle goal lever
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2) || (leverTimeoutReached == false && isMidScore == true)) {
+        isMidScore = true;
+        hood.extend();
+        leverTimeoutReached = false;
+        fire(true, 90);
     }
 
 

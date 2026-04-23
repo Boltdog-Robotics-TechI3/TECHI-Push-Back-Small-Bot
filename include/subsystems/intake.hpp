@@ -4,7 +4,7 @@
 
 void intakeInitialize();
 void intakePeriodic();
-void fire(bool async);
+void fire(bool async, int speed=127);
 
 void startCounting();
 void suspendCounting();
