@@ -1,5 +1,6 @@
 #pragma once
 #include "api.h"
+#include "pros/rtos.h"
 #include "pros/rtos.hpp"
 
 typedef void (*callback_function)();
@@ -22,7 +23,7 @@ class Timer {
                     callback();
                 }
             }
-        });
+        }, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_MIN);
     public:
         Timer(int time, callback_function cb);
         ~Timer();

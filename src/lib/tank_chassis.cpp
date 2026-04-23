@@ -229,9 +229,9 @@ void TankChassis::turnToAngle(turnToAngleParams params) {
     if (timeoutTimer == nullptr) {
         timeoutTimer = new Timer(params.timeout, +[]() { Chassis::isAtSetpoint = true; }); 
         smallErrorTimer = new Timer(params.smallErrorTimeout, +[]() { Chassis::isAtSetpoint = true; });
-        largeErrorTimer = new Timer(params.largeErrorTimeout, +[]() { Chassis::isAtSetpoint = true; });
-        failsafeTimer = new Timer(100, +[]() { Chassis::isAtSetpoint = true; });
-        enableTurningTimer = new Timer(0, +[]() { Chassis::enableTurning = true; });
+        //largeErrorTimer = new Timer(params.largeErrorTimeout, +[]() { Chassis::isAtSetpoint = true; });
+        //failsafeTimer = new Timer(100, +[]() { Chassis::isAtSetpoint = true; });
+        //enableTurningTimer = new Timer(0, +[]() { Chassis::enableTurning = true; });
     }
 
     isAtSetpoint = false;
