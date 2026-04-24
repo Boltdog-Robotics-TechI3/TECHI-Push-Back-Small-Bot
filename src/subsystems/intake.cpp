@@ -23,6 +23,26 @@ namespace {
     }
 }
 
+void intakeJamHandler(void* param) {
+    int stallTime = -1;
+    while (true) {
+        if (intake.get_actual_velocity() == 0 && intake.get_target_velocity() > 0) {
+            if (stallTime == -1) {
+                stallTime = pros::millis();
+            } else if (pros::millis() - stallTime >= 150) {
+                intake.move(-127);
+                pros::delay(100);
+                intake.move(127);
+            }
+        } else {
+            stallTime = -1;
+        }
+        pros::delay(20);
+    }
+}
+
+pros::Task intakeJamTask(intakeJamHandler);
+
 Timer *leverTimer = nullptr;
 
 void intakeInitialize()
@@ -31,43 +51,51 @@ void intakeInitialize()
     lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
-/**
- * Fire and reset the lever. Even with async enabled, this function does NOT run in a task. It simply returns after one pass
- * of the loop, so that it works nicely with control loops for opcontrol. Custom logic in the control loop 
- * is required to make it work with async on. Leave async off for most situations in autonomous.
- *
- * @param async Whether the function should run asynchronously or not.
- */
-void fire(bool async=false, int speed) {
-    if (leverTimer == nullptr) {
-        leverTimer = new Timer(400, onLeverTimeout); // Timer to determine if lever is stopped
-    }
+bool resetting = false;
 
-    if (!async) {
-        leverTimeoutReached = false;
-    }
+void fire() {
+    firing = true;
+}
 
-    while (leverTimeoutReached == false) {
-        if (leverReset) {
-            lever.move(-speed);
-        } else {
-            lever.move(speed);
-        }
-        
-        bool leverStopped = std::abs(lever.get_actual_velocity()*1.5) < abs(lever.get_target_velocity());
-        if (leverStopped) {
-            if (!leverTimer->isRunning()) {
-                leverTimer->start();
+void fire_lever(void* params) {
+    while (true) {
+        if (firing) {
+            int deadline = pros::millis() + 500;
+            int settledSince = -1;
+            while (firing) {
+                if (resetting) {
+                    lever.move(-127);
+                } else {
+                    lever.move(127);
+                }
+
+                bool settled = std::abs(lever.get_actual_velocity()*1.5) < abs(lever.get_target_velocity());
+
+                if (settled) {
+                    controller.set_text(0,0, std::to_string(resetting));
+                    if (settledSince == -1) {
+                        settledSince = pros::millis();
+                    } else if (pros::millis() - settledSince > 500) {
+                        if (!resetting) {
+                            deadline = pros::millis() + 500;
+                            settled = false;
+                            resetting = true;
+                        } else {
+                            resetting = false;
+                            firing = false;
+                        }
+                    }
+                } else {
+                    settledSince = -1;
+                }
+                pros::delay(20);
             }
-        } else {
-            leverTimer->stop();
         }
-
-        // Inner loops don't work well with control loops, return to caller and let the control loop handle the logic
-        if (async) { return; }
         pros::delay(20);
     }
 }
+
+pros::Task fireTask(fire_lever);
 
 void countBlocks() {
     // Tasks start upon creation. This loops forces it to wait until its needed.
@@ -133,19 +161,19 @@ void intakePeriodic()
     }
 
     // normal Lever
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) || (leverTimeoutReached == false && isMidScore == false)) {
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) && isMidScore == false) {
         isMidScore == false;
         hood.extend();
         leverTimeoutReached = false;
-        fire(true);
+        fire();
     }
 
     // middle goal lever
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2) || (leverTimeoutReached == false && isMidScore == true)) {
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2) && isMidScore == true) {
         isMidScore = true;
         hood.extend();
         leverTimeoutReached = false;
-        fire(true, 90);
+        fire();
     }
     
     

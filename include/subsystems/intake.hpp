@@ -4,9 +4,11 @@
 
 void intakeInitialize();
 void intakePeriodic();
-void fire(bool async, int speed=127);
+void fire();
 
 void startCounting();
 void suspendCounting();
 inline std::atomic<bool> counting = false;
 inline std::atomic<int> blockCount{0};
+
+inline bool firing = false;

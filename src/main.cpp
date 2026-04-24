@@ -3,7 +3,9 @@
 #include "lib/pid.hpp"
 #include "pros/rtos.hpp"
 #include "subsystems/intake.hpp"
+#include <filesystem>
 #include <string>
+#include <iostream>
 
 
 void wiggle(int speed){
@@ -65,57 +67,50 @@ void competition_initialize() {}
 void autonomous() {			
 	// when making the auto make sure the speed is capped at 60% (127 *.6) so that
 	// the robot doesn't go past the error range.
-	Pose matchLoadStation({47.5, -62.3, 0});
+	// bug_test();
+	// return;
+	Pose matchLoadStation({-47, -62.4, 0});
+	int smallTimeout = 500;
+	int timeout = 1000;
 	chassis.startTracking();
 	matchLoader.retract();
-	chassis.setPose({14.5, -47.5, M_PI_2});
+	chassis.setPose({-14.5, -47.5, 3*M_PI_2});
 	int maxSpeed = 127*0.6;
 	int lowSpeed = 127 * 0.4;
-	chassis.moveToPose({.targetPose = {47.5, -47.5, 0}, .timeout = 5000, .maxMoveSpeed = maxSpeed});
+	chassis.moveToPose({.targetPose = {-47, -47.5, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
 	lift.extend();
-	chassis.turnToAngle({.targetAngle = 359});
-	pros::delay(10000);
-	hood.extend();
+	hood.retract();
+	chassis.turnToAngle({.targetAngle = 1, .timeout = smallTimeout + 50});
 
 	intake.move(127);
-	chassis.moveToPose({.targetPose = matchLoadStation, .timeout = 1000, .maxMoveSpeed = 127});
+	startCounting();
+	chassis.moveToPose({.targetPose = matchLoadStation, .timeout = smallTimeout, .maxMoveSpeed = 127});
 
-	// TODO: Fine tune timing to only grab our alliance blocks
-	pros::delay(1000);
-	//controller.set_text(0,0, std::to_string(blockCount));
-	chassis.moveToPose({.targetPose = {47.5, -28.5, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed}); //goto score
-	//wiggle(10);
-	// intake.move(0);
-	chassis.turnToAngle({.targetAngle = 359, .timeout = 1000});
+	pros::delay(300);
+	if (blockCount <= 1) { // Adjust position if we're not getting blocks from the loader
+		chassis.moveToPose({.targetPose = {-47, -58.5, 0}});
+		controller.set_text(0, 0, std::to_string(blockCount));
+		pros::delay(100);
+	}
 
-	//fire(false);
+	chassis.moveToPose({.targetPose = {-47, -27, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed}); //goto score
 
-	// //go back to get the rest of the blocks
-	pros::delay(3000);
-
-	matchLoader.extend();
-	chassis.moveToPose({.targetPose = matchLoadStation, .timeout = 3000, .maxMoveSpeed = lowSpeed});
-	pros::delay(2500);
-
-	// Throw other alliance blocks in the corner
-	chassis.moveToPose({.targetPose = {47.5, -49.5, 0}, .timeout = 2500, .maxMoveSpeed = maxSpeed});
-	chassis.turnToAngle({.targetAngle = 225, .timeout = 2000});
+	chassis.turnToAngle({.targetAngle = 1, .timeout = smallTimeout});
 	hood.extend();
-	//fire(false);
-	pros::delay(3000);
+	pros::delay(100);
 
-	// Go back to match load
-	chassis.turnToAngle({.targetAngle = 0, .timeout = 1000});
-	chassis.moveToPose({.targetPose = matchLoadStation, .timeout = 3000, .maxMoveSpeed = lowSpeed});
-	pros::delay(5000);
+	fire();
+	while (firing) { pros::delay(20); };
 
-	// TODO: Score remaining blocks
-	chassis.moveToPose({.targetPose = {47.5, -28.5, 0}, .timeout = 2000, .maxMoveSpeed = maxSpeed});
-	controller.set_text(0, 0, chassis.getPose().to_string());
-	intake.move(0);
+	intake.brake();
 
-
+	chassis.moveToPose({.targetPose = {-47, -47.5, 0}, .timeout = 800, .maxMoveSpeed = maxSpeed});
+	chassis.turnToAngle({.targetAngle = 315, .timeout = smallTimeout});
+	chassis.moveToPose({.targetPose = {-35.5, -11.5, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed});
+	chassis.turnToAngle({.targetAngle = 0, .timeout = smallTimeout});
+	lift.retract();
+	chassis.moveToPose({.targetPose = {-35.5, 0, 0}});
 }
 
 /**
@@ -141,7 +136,7 @@ void opcontrol() {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
 		chassis.arcade(throttle,turn);
-		controller.set_text(0,0,std::to_string(blockCount));
+		//controller.set_text(0,0,std::to_string(blockCount));
 		intakePeriodic();
 		pros::delay(20);
 	}
