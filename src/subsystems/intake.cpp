@@ -11,6 +11,7 @@ namespace {
     std::atomic<bool> leverReset{false}; // Flag to determine if the lever is resetting
     std::atomic<bool> leverTimeoutReached{true}; // Flag to determine if the lever has fired and reset
     bool isMidScore = false;
+    int leverSpeed = 127;
     void onLeverTimeout() {
         if (leverReset) {
             leverTimeoutReached = true;
@@ -64,9 +65,9 @@ void fire_lever(void* params) {
             int settledSince = -1;
             while (firing) {
                 if (resetting) {
-                    lever.move(-127);
+                    lever.move(-100);
                 } else {
-                    lever.move(127);
+                    lever.move(leverSpeed);
                 }
 
                 bool settled = std::abs(lever.get_actual_velocity()*1.5) < abs(lever.get_target_velocity());
@@ -80,9 +81,11 @@ void fire_lever(void* params) {
                             deadline = pros::millis() + 500;
                             settled = false;
                             resetting = true;
+                            settledSince = -1;
                         } else {
                             resetting = false;
                             firing = false;
+                            settledSince = -1;
                         }
                     }
                 } else {
@@ -91,6 +94,7 @@ void fire_lever(void* params) {
                 pros::delay(20);
             }
         }
+        lever.move(0);
         pros::delay(20);
     }
 }
@@ -161,16 +165,18 @@ void intakePeriodic()
     }
 
     // normal Lever
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2) && isMidScore == false) {
-        isMidScore == false;
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
+        isMidScore = false;
+        leverSpeed = 127;
         hood.extend();
         leverTimeoutReached = false;
         fire();
     }
 
     // middle goal lever
-    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2) && isMidScore == true) {
+    if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) {
         isMidScore = true;
+        leverSpeed = 80;
         hood.extend();
         leverTimeoutReached = false;
         fire();
