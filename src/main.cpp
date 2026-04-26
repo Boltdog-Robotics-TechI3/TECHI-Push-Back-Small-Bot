@@ -8,8 +8,8 @@
 #include <iostream>
 
 
-void wiggle(int speed){
-	for(int i=0; i<10; i++) {
+void wiggle(int speed, int wiggles){
+	for(int i=0; i<wiggles; i++) {
 		leftMotors.move(speed+5);
 		rightMotors.move(-speed);
 		pros::delay(100);	
@@ -69,7 +69,7 @@ void autonomous() {
 	// the robot doesn't go past the error range.
 	// bug_test();
 	// return;
-	Pose matchLoadStation({-47, -62.4, 0});
+	Pose matchLoadStation({-45.5, -64, 0});
 	int smallTimeout = 500;
 	int timeout = 1000;
 	chassis.startTracking();
@@ -77,15 +77,18 @@ void autonomous() {
 	chassis.setPose({-14.5, -47.5, 3*M_PI_2});
 	int maxSpeed = 127*0.6;
 	int lowSpeed = 127 * 0.4;
-	chassis.moveToPose({.targetPose = {-47, -47.5, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed});
+	int overMax = 127 * 0.8;
+	chassis.moveToPose({.targetPose = {-45.5, -47.5, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed});
 	matchLoader.extend();
 	lift.extend();
 	hood.retract();
+	hood.extend();
 	chassis.turnToAngle({.targetAngle = 1, .timeout = smallTimeout + 50});
 
 	intake.move(127);
 	startCounting();
 	chassis.moveToPose({.targetPose = matchLoadStation, .timeout = smallTimeout, .maxMoveSpeed = 127});
+	wiggle(20, 2);
 
 	pros::delay(300);
 	if (blockCount <= 1) { // Adjust position if we're not getting blocks from the loader
@@ -95,9 +98,10 @@ void autonomous() {
 	}
 
 	chassis.moveToPose({.targetPose = {-47, -27, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed}); //goto score
+	wiggle(40, 4);
+
 
 	chassis.turnToAngle({.targetAngle = 1, .timeout = smallTimeout});
-	hood.extend();
 	pros::delay(100);
 
 	fire();
@@ -110,6 +114,7 @@ void autonomous() {
 	chassis.moveToPose({.targetPose = {-35.5, -11.5, 0}, .timeout = timeout, .maxMoveSpeed = maxSpeed});
 	chassis.turnToAngle({.targetAngle = 0, .timeout = smallTimeout});
 	lift.retract();
+	matchLoader.retract();
 	chassis.moveToPose({.targetPose = {-35.5, 0, 0}});
 }
 
@@ -135,7 +140,11 @@ void opcontrol() {
 	while(true) {
 		int throttle = controller.get_analog(ANALOG_LEFT_Y);
 		int turn = controller.get_analog(ANALOG_RIGHT_X);
-		chassis.arcade(throttle,turn);
+		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
+			chassis.arcade(throttle*0.45,turn*0.45);
+		} else{
+			chassis.arcade(throttle,turn);
+		}
 		//controller.set_text(0,0,std::to_string(blockCount));
 		intakePeriodic();
 		pros::delay(20);
